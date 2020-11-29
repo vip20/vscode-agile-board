@@ -21,7 +21,7 @@ npm install
 npm run build
 ```
 
-And then press F5, in Extension Development Host session, run `Start React Webview` command from command palette.
+And then press F5, in Extension Development Host session, run `Start New Board` command from command palette.
 
 ## Under the hood
 
