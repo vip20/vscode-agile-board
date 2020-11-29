@@ -13,13 +13,14 @@
     "commands": [
       {
         "command": "react-webview.start",
-        "title": "Start React Webview",
-        "category": "React"
+        "title": "Start New Board",
+        "category": "Agile Board"
       }
     ]
   },
   "dependencies": {
     "react": "^16.3.2",
+    "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.3.2",
     "terser": "3.16.0",
     "vscode": "^1.1.17"
@@ -36,9 +37,12 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@emotion/react": "^11.1.1",
+    "@emotion/styled": "^11.0.0",
     "@types/jest": "^23.3.13",
     "@types/node": "^10.1.2",
     "@types/react": "^16.3.14",
+    "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-dom": "^16.0.5",
     "react-scripts": "^2.1.3",
     "rewire": "^4.0.1",
