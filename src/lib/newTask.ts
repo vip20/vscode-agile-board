@@ -1,8 +1,7 @@
 import * as vscode from "vscode";
-import * as fs from "fs-extra";
 import * as path from "path";
 import moment from "moment";
-import { resolveHome } from "./utils";
+import { resolveHome, createFileUtils } from "./utils";
 
 // This function handles creation of a new task in default board folder
 export function newTask(boardName: string) {
@@ -20,7 +19,7 @@ export function newTask(boardName: string) {
 
 async function createTask(boardFolder: string, boardName: string) {
   let fileName = `${moment().format("YYYY-MM-DD_HH-mm-ss")}.md`;
-  const createFilePromise = createFile(
+  const createFilePromise = createFileUtils(
     path.join(boardFolder, boardName),
     fileName
   );
@@ -37,24 +36,6 @@ async function createTask(boardFolder: string, boardName: string) {
       })
       .then(() => {
         console.log("Task created successfully: ", filePath);
-      });
-  });
-}
-
-// Create the given file if it doesn't exist
-function createFile(folderPath: string, fileName: string) {
-  return new Promise((resolve, reject) => {
-    if (folderPath == null || fileName == null) {
-      reject();
-    }
-    const fullPath = path.join(folderPath, fileName);
-    // fs-extra
-    fs.ensureFile(fullPath)
-      .then(() => {
-        resolve(fullPath);
-      })
-      .catch((err) => {
-        reject(err);
       });
   });
 }

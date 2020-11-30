@@ -2,12 +2,13 @@ import * as React from "react";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import BoardItem from "../board-item";
+import { Column, Task } from "../../core/types";
 
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
-  column: any;
-  items: any;
+  column: Column;
+  tasks: Task[];
 };
 
 // Define types for board column content style properties
@@ -56,8 +57,8 @@ export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
             isDraggingOver={snapshot.isDraggingOver}
           >
             {/* All board items belong into specific column. */}
-            {props.items.map((item: any, index: number) => (
-              <BoardItem key={item.id} item={item} index={index} />
+            {props.tasks.map((task: any, index: number) => (
+              <BoardItem key={task.id} task={task} index={index} />
             ))}
             {provided.placeholder}
           </BoardColumnContent>

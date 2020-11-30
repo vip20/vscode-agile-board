@@ -1,11 +1,12 @@
 import * as React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
+import { Task } from "../../core/types";
 
 // Define types for board item element properties
 type BoardItemProps = {
   index: number;
-  item: any;
+  task: Task;
 };
 
 // Define types for board item element style properties
@@ -33,7 +34,7 @@ const BoardItemEl = styled.div<BoardItemStylesProps>`
 // Create and export the BoardItem component
 export default function BoardItem(props: BoardItemProps) {
   return (
-    <Draggable draggableId={props.item.id} index={props.index}>
+    <Draggable draggableId={props.task.id} index={props.index}>
       {(provided, snapshot) => (
         <BoardItemEl
           {...provided.draggableProps}
@@ -42,7 +43,7 @@ export default function BoardItem(props: BoardItemProps) {
           isDragging={snapshot.isDragging}
         >
           {/* The content of the BoardItem */}
-          {props.item.content}
+          {props.task.description}
         </BoardItemEl>
       )}
     </Draggable>
