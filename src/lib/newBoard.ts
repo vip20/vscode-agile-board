@@ -4,8 +4,9 @@ import * as fs from "fs-extra";
 import { resolveHome, createFileUtils } from "./utils";
 import { defaultBoardConfig } from "../core/constants";
 import { Board } from "../core/types";
+import ReactPanel from "./reactPanel";
 const moment = require("moment");
-export default function newBoard() {
+export default function newBoard(extensionPath: string) {
   const config = vscode.workspace.getConfiguration("vsagile");
   const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
 
@@ -15,10 +16,10 @@ export default function newBoard() {
     );
     return;
   }
-  createBoard(boardFolder);
+  createBoard(boardFolder, extensionPath);
 }
 
-function createBoard(boardFolder: string) {
+function createBoard(boardFolder: string, extensionPath: string) {
   const inputPromise = vscode.window.showInputBox({
     prompt: `Board title?. Do not leave this blank.`,
     value: "",
@@ -44,5 +45,7 @@ function createBoard(boardFolder: string) {
       };
       fs.writeJsonSync(boardConfigFile, config);
     }
+
+    ReactPanel.createOrShow(extensionPath);
   });
 }

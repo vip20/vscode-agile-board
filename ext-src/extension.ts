@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Start Board
   let newBoardDisposable = vscode.commands.registerCommand(
     "vsagile.start",
-    newBoard
+    () => newBoard(context.extensionPath)
   );
   context.subscriptions.push(newBoardDisposable);
 
