@@ -4,6 +4,7 @@ import { DragDropContext } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
 import { defaultBoardConfig } from "../../core/constants";
+import { Column } from "../../core/types";
 
 // Create styles board element properties
 const BoardEl = styled.div`
@@ -115,10 +116,10 @@ export default function Board() {
         {/* Get all columns in the order specified in 'board-initial-data.ts' */}
         {boardData.columnsOrder.map((columnId: any) => {
           // Get id of the current column
-          const column = (boardData.columns as any)[columnId];
+          const column: Column = (boardData.columns as any)[columnId];
 
           // Get item belonging to the current column
-          const tasks = column.itemsIds.map(
+          const tasks = column.tasksIds.map(
             (taskId: string) => (boardData.tasks as any)[taskId]
           );
 
