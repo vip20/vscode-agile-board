@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
-import { initialBoardData } from "../core/constants";
+import { initialBoardData } from "../../core/constants";
 
 // Create styles board element properties
 const BoardEl = styled.div`

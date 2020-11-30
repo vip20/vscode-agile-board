@@ -5,20 +5,59 @@
     "vscode": "^1.23.0"
   },
   "publisher": "sqrdup",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqrdcodemons/vscode-agile-board"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "vscode-agile",
+    "vsagile",
+    "todo",
+    "agile",
+    "board",
+    "note",
+    "notes"
+  ],
   "activationEvents": [
-    "onCommand:react-webview.start"
+    "onCommand:vsagile.startDummy",
+    "onCommand:vsagile.start",
+    "onCommand:vsagile.setupBoard"
   ],
   "main": "./build/ext-src/extension.js",
+  "license": "MIT",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "VSAgile Board Configuration",
+      "properties": {
+        "vsagile.defaultBoardPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to directory to save boards. Use ~/ to denote a relative path from home folder."
+        }
+      }
+    },
     "commands": [
       {
-        "command": "react-webview.start",
-        "title": "Start New Board",
-        "category": "Agile Board"
+        "command": "vsagile.startDummy",
+        "title": "VSAgile: Start Dummy Board"
+      },
+      {
+        "command": "vsagile.start",
+        "title": "VSAgile: Start New Board"
+      },
+      {
+        "command": "vsagile.setupBoard",
+        "title": "VSAgile: Run setup"
       }
     ]
   },
   "dependencies": {
+    "fs-extra": "^9.0.1",
+    "moment": "^2.29.1",
     "react": "^16.3.2",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.3.2",
@@ -39,7 +78,9 @@
   "devDependencies": {
     "@emotion/react": "^11.1.1",
     "@emotion/styled": "^11.0.0",
+    "@types/fs-extra": "^8.1.0",
     "@types/jest": "^23.3.13",
+    "@types/moment": "^2.13.0",
     "@types/node": "^10.1.2",
     "@types/react": "^16.3.14",
     "@types/react-beautiful-dnd": "^13.0.0",
