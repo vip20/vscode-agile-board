@@ -15,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
     "vsagile.start",
     newBoard
   );
+  context.subscriptions.push(newBoardDisposable);
 
   // Run setup
   let setupDisposable = vscode.commands.registerCommand(
@@ -23,3 +24,5 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(setupDisposable);
 }
+// this method is called when your extension is deactivated
+export function deactivate() {}
