@@ -13,9 +13,9 @@ const BoardEl = styled.div`
   justify-content: space-between;
 `;
 
-export default function Board() {
+export default function Board({ configJson }: any) {
   // Initialize board state with board data
-  const [boardData, setBoardData] = useState(defaultBoardConfig);
+  const [boardData, setBoardData] = useState(configJson);
 
   // Handle drag & drop
   function onDragEnd(result: any) {

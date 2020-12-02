@@ -2,8 +2,8 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { resolveHome, createFileUtils } from "./utils";
-import { defaultBoardConfig } from "../core/constants";
-import { Board } from "../core/types";
+import { defaultBoardConfig } from "../../src/core/constants";
+import { Board } from "../../src/core/types";
 import ReactPanel from "./reactPanel";
 const moment = require("moment");
 export default function newBoard(extensionPath: string) {
@@ -46,6 +46,10 @@ function createBoard(boardFolder: string, extensionPath: string) {
       fs.writeJsonSync(boardConfigFile, config);
     }
 
-    ReactPanel.createOrShow(extensionPath);
+    let _panel = ReactPanel.createOrShow(extensionPath);
+    _panel.webview.postMessage({
+      command: "configJson",
+      data: config,
+    });
   });
 }

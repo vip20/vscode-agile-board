@@ -9,7 +9,7 @@ export default class ReactPanel {
    */
   public static currentPanel: ReactPanel | undefined;
 
-  private static readonly viewType = "react";
+  private static readonly viewType = "vsagile";
 
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionPath: string;
@@ -30,6 +30,7 @@ export default class ReactPanel {
         column || vscode.ViewColumn.One
       );
     }
+    return ReactPanel.currentPanel._panel;
   }
 
   private constructor(extensionPath: string, column: vscode.ViewColumn) {
@@ -38,7 +39,7 @@ export default class ReactPanel {
     // Create and show a new webview panel
     this._panel = vscode.window.createWebviewPanel(
       ReactPanel.viewType,
-      "React",
+      "VSAgile",
       column,
       {
         // Enable javascript in the webview
@@ -50,7 +51,6 @@ export default class ReactPanel {
         ],
       }
     );
-
     // Set the webview's initial html content
     this._panel.webview.html = this._getHtmlForWebview();
 
@@ -64,6 +64,9 @@ export default class ReactPanel {
         switch (message.command) {
           case "alert":
             vscode.window.showErrorMessage(message.text);
+            return;
+          case "get-data":
+            console.log("data");
             return;
         }
       },
@@ -121,17 +124,30 @@ export default class ReactPanel {
 				<meta name="theme-color" content="#000000">
 				<title>VSAgile</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(path.join(this._extensionPath, "build")).with({
-          scheme: "vscode-resource",
-        })}/">
+        <meta http-equiv="Content-Security-Policy"
+                    content="default-src 'none';
+                             img-src https:;
+                             script-src 'unsafe-eval' 'unsafe-inline' vscode-resource:;
+                             style-src vscode-resource: 'unsafe-inline';">
+                                     <base href="${vscode.Uri.file(
+                                       path.join(this._extensionPath, "build")
+                                     ).with({
+                                       scheme: "vscode-resource",
+                                     })}/">
+
 			</head>
 
-			<body>
-				<noscript>You need to enable JavaScript to run this app.</noscript>
+      <body>
+      
+				<noscript>You need to enable JavaScript to run this app.</noscript>				<div id="root"></div>
 				<div id="root"></div>
 				
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+        <script>
+            (function() {
+                const vscode = acquireVsCodeApi();
+            })
+        </script>
+        <script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
   }

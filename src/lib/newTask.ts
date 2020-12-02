@@ -1,8 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import moment from "moment";
 import { resolveHome, createFileUtils } from "./utils";
-
+import moment from "moment";
 // This function handles creation of a new task in default board folder
 export function newTask(boardName: string) {
   const config = vscode.workspace.getConfiguration("vsagile");
