@@ -46,8 +46,8 @@ function createBoard(boardFolder: string, extensionPath: string) {
       fs.writeJsonSync(boardConfigFile, config);
     }
 
-    let _panel = ReactPanel.createOrShow(extensionPath);
-    _panel.webview.postMessage({
+    ReactPanel.createOrShow(extensionPath);
+    ReactPanel.getPanel()?.webview.postMessage({
       command: "configJson",
       data: config,
     });

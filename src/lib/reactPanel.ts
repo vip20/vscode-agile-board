@@ -15,6 +15,10 @@ export default class ReactPanel {
   private readonly _extensionPath: string;
   private _disposables: vscode.Disposable[] = [];
 
+  public static getPanel() {
+    return ReactPanel.currentPanel?._panel;
+  }
+
   public static createOrShow(extensionPath: string) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
@@ -30,7 +34,6 @@ export default class ReactPanel {
         column || vscode.ViewColumn.One
       );
     }
-    return ReactPanel.currentPanel._panel;
   }
 
   private constructor(extensionPath: string, column: vscode.ViewColumn) {
