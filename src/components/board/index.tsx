@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
@@ -15,7 +15,11 @@ const BoardEl = styled.div`
 
 export default function Board({ configJson }: any) {
   // Initialize board state with board data
-  const [boardData, setBoardData] = useState(configJson);
+  const [boardData, setBoardData] = useState(defaultBoardConfig);
+
+  useEffect(() => {
+    setBoardData(configJson);
+  }, [configJson]);
 
   // Handle drag & drop
   function onDragEnd(result: any) {
@@ -43,18 +47,18 @@ export default function Board({ configJson }: any) {
     // Moving items in the same list
     if (columnStart === columnFinish) {
       // Get all item ids in currently active list
-      const newItemsIds = Array.from(columnStart.itemsIds);
+      const newTaskIds = Array.from(columnStart.tasksIds);
 
       // Remove the id of dragged item from its original position
-      newItemsIds.splice(source.index, 1);
+      newTaskIds.splice(source.index, 1);
 
       // Insert the id of dragged item to the new position
-      newItemsIds.splice(destination.index, 0, draggableId);
+      newTaskIds.splice(destination.index, 0, draggableId);
 
       // Create new, updated, object with data for columns
-      const newColumnStart = {
+      const newColumnStart: Column = {
         ...columnStart,
-        itemsIds: newItemsIds,
+        tasksIds: newTaskIds,
       };
 
       // Create new board state with updated data for columns
@@ -71,27 +75,27 @@ export default function Board({ configJson }: any) {
     } else {
       // Moving items from one list to another
       // Get all item ids in source list
-      const newStartItemsIds = Array.from(columnStart.itemsIds);
+      const newStartTaskIds = Array.from(columnStart.tasksIds);
 
       // Remove the id of dragged item from its original position
-      newStartItemsIds.splice(source.index, 1);
+      newStartTaskIds.splice(source.index, 1);
 
       // Create new, updated, object with data for source column
-      const newColumnStart = {
+      const newColumnStart: Column = {
         ...columnStart,
-        itemsIds: newStartItemsIds,
+        tasksIds: newStartTaskIds,
       };
 
       // Get all item ids in destination list
-      const newFinishItemsIds = Array.from(columnFinish.itemsIds);
+      const newFinishTaskIds = Array.from(columnFinish.tasksIds);
 
       // Insert the id of dragged item to the new position in destination list
-      newFinishItemsIds.splice(destination.index, 0, draggableId);
+      newFinishTaskIds.splice(destination.index, 0, draggableId);
 
       // Create new, updated, object with data for destination column
-      const newColumnFinish = {
+      const newColumnFinish: Column = {
         ...columnFinish,
-        itemsIds: newFinishItemsIds,
+        tasksIds: newFinishTaskIds,
       };
 
       // Create new board state with updated data for both, source and destination columns
