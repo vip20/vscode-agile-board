@@ -20,6 +20,9 @@ export default function Board({ configJson, vscodeApi }: any) {
   useEffect(() => {
     // Update board when configJson changes from input
     setBoardData(configJson);
+    if (configJson !== defaultBoardConfig) {
+      vscodeApi.setState(configJson);
+    }
   }, [configJson]);
 
   useEffect(() => {
@@ -30,7 +33,7 @@ export default function Board({ configJson, vscodeApi }: any) {
     }
   }, [vscodeApi]);
 
-  function updateJsonConfig(data: types.Board) {
+  function updateJsonConfig(data: types.Board, isInit: boolean = false) {
     vscodeApi.postMessage({
       action: ACTION.updateJson,
       board: data.boardName,

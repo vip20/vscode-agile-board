@@ -31,11 +31,16 @@ const BoardColumnWrapper = styled.div`
 
 // Create styles for BoardColumnTitle element
 const BoardColumnTitle = styled.h2`
-  font: 14px sans-serif;
   margin-bottom: 12px;
-  font-weight: 600;
   display: flex;
   justify-content: space-between;
+  h2 {
+    font: 14px sans-serif;
+    font-weight: 600;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 // Create styles for BoardColumnContent element
@@ -51,7 +56,9 @@ export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
   return (
     <BoardColumnWrapper>
       {/* Title of the column */}
-      <BoardColumnTitle>{props.column.title}</BoardColumnTitle>
+      <BoardColumnTitle>
+        <h2>{props.column.title}</h2>
+      </BoardColumnTitle>
 
       <Droppable droppableId={props.column.id}>
         {(provided, snapshot) => (
