@@ -1,5 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { ACTION } from "../core/constants";
+import { resolveHome, updateConfigJson } from "./utils";
 /**
  * Manages react webview panels
  */
@@ -47,7 +49,6 @@ export default class ReactPanel {
       {
         // Enable javascript in the webview
         enableScripts: true,
-
         // And restric the webview to only loading content from our extension's `media` directory.
         localResourceRoots: [
           vscode.Uri.file(path.join(this._extensionPath, "build")),
@@ -56,6 +57,8 @@ export default class ReactPanel {
     );
     // Set the webview's initial html content
     this._panel.webview.html = this._getHtmlForWebview();
+    const config = vscode.workspace.getConfiguration("vsagile");
+    const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programatically
@@ -64,12 +67,15 @@ export default class ReactPanel {
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       (message) => {
-        switch (message.command) {
-          case "alert":
+        switch (message.action) {
+          case ACTION.alert:
             vscode.window.showErrorMessage(message.text);
             return;
-          case "get-data":
-            console.log("data");
+          case ACTION.updateJson:
+            updateConfigJson(
+              path.join(boardFolder, message.board),
+              message.data
+            );
             return;
         }
       },
@@ -81,7 +87,7 @@ export default class ReactPanel {
   public doRefactor() {
     // Send a message to the webview webview.
     // You can send any JSON serializable data.
-    this._panel.webview.postMessage({ command: "refactor" });
+    this._panel.webview.postMessage({ action: ACTION.refactor });
   }
 
   public dispose() {
@@ -146,9 +152,7 @@ export default class ReactPanel {
 				<div id="root"></div>
 				
         <script>
-            (function() {
-                const vscode = acquireVsCodeApi();
-            })
+                const vscodeApi = acquireVsCodeApi();
         </script>
         <script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>

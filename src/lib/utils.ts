@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as os from "os";
 import * as fs from "fs-extra";
+import * as types from "../core/types";
 
 // Resolves the home tilde.
 export function resolveHome(filepath: string) {
@@ -30,4 +31,9 @@ export function createFileUtils(folderPath: string, fileName: string) {
         reject(err);
       });
   });
+}
+
+export function updateConfigJson(boardPath: string, data: types.Board) {
+  // console.log("update json", path.join(boardPath, "config.json"));
+  fs.writeFileSync(path.join(boardPath, "config.json"), JSON.stringify(data));
 }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import "./App.css";
 import Board from "./components/board";
-import { defaultBoardConfig } from "./core/constants";
+import { ACTION, defaultBoardConfig } from "./core/constants";
 import * as types from "./core/types";
-
+declare const vscodeApi: any;
 export default function App() {
   const [configJson, _setConfigJson] = useState(defaultBoardConfig);
   const configRef = useRef<types.Board>(configJson);
@@ -15,9 +15,9 @@ export default function App() {
 
   const handleMsgEvent = useCallback((event: any) => {
     const message = event.data;
-    if (message.command && message.data) {
-      switch (message.command) {
-        case "configJson":
+    if (message.action && message.data) {
+      switch (message.action) {
+        case ACTION.fetchJson:
           setConfigJson(message.data);
           break;
       }
@@ -32,7 +32,7 @@ export default function App() {
 
   return (
     <>
-      <Board configJson={configJson}></Board>
+      <Board configJson={configJson} vscodeApi={vscodeApi}></Board>
     </>
   );
 }

@@ -2,14 +2,11 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { resolveHome, createFileUtils } from "./utils";
-import { defaultBoardConfig } from "../../src/core/constants";
+import { ACTION, defaultBoardConfig } from "../../src/core/constants";
 import { Board } from "../../src/core/types";
 import ReactPanel from "./reactPanel";
 const moment = require("moment");
-export default function newBoard(extensionPath: string) {
-  const config = vscode.workspace.getConfiguration("vsagile");
-  const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
-
+export default function newBoard(boardFolder: string, extensionPath: string) {
   if (boardFolder == null || !boardFolder) {
     vscode.window.showErrorMessage(
       "Default board folder not found. Please run setup."
@@ -45,10 +42,9 @@ function createBoard(boardFolder: string, extensionPath: string) {
       };
       fs.writeJsonSync(boardConfigFile, config);
     }
-
     ReactPanel.createOrShow(extensionPath);
     ReactPanel.getPanel()?.webview.postMessage({
-      command: "configJson",
+      action: ACTION.fetchJson,
       data: config,
     });
   });
