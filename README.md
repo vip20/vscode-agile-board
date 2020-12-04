@@ -1,4 +1,4 @@
-# VSCode Webview React
+# VSCode Agile Board
 
 This project was bootstrapped with
 
