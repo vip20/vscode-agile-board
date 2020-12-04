@@ -21,7 +21,7 @@ type BoardColumnContentStylesProps = {
 const BoardColumnWrapper = styled.div`
   flex: 1;
   padding: 8px;
-  background-color: #e5eff5;
+  background-color: var(--vscode-editorGroup-dropBackground);
   border-radius: 4px;
 
   & + & {
@@ -38,7 +38,8 @@ const BoardColumnTitle = styled.h2`
 // Create styles for BoardColumnContent element
 const BoardColumnContent = styled.div<BoardColumnContentStylesProps>`
   min-height: 20px;
-  background-color: ${(props) => (props.isDraggingOver ? "#aecde0" : null)};
+  background-color: ${(props) =>
+    props.isDraggingOver ? "var(--vscode-editor-selectionBackground)" : null};
   border-radius: 4px;
 `;
 

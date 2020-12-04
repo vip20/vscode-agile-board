@@ -11,6 +11,7 @@ const BoardEl = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  padding: 12px;
 `;
 
 export default function Board({ configJson }: any) {

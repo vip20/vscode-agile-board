@@ -18,12 +18,15 @@ type BoardItemStylesProps = {
 // Create style for board item element
 const BoardItemEl = styled.div<BoardItemStylesProps>`
   padding: 8px;
-  background-color: ${(props) => (props.isDragging ? "#d3e4ee" : "#fff")};
+  background-color: ${(props) =>
+    props.isDragging
+      ? "var(--vscode-editorGroup-dropBackground)"
+      : "var(--vscode-editor-background)"};
   border-radius: 4px;
   transition: background-color 0.25s ease-out;
 
   &:hover {
-    background-color: #f7fafc;
+    background-color: var(--vscode-tab-activeBackground);
   }
 
   & + & {
