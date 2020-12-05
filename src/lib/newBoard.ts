@@ -35,46 +35,51 @@ function quickPick(boardFolder: string, extensionPath: string) {
     items: quickPickItems,
     placeholder: "Select a board to open",
   });
-  createBoard(boardFolder, extensionPath, inputPromise);
+  inputPromise.then(
+    (value) => {
+      createBoard(boardFolder, extensionPath, value.label);
+    },
+    async (e) => {
+      if (e === "isEmpty") {
+        const text = await vscode.window.showInputBox({
+          prompt: `Existing boards will be opened if same name is used.`,
+          value: "",
+          placeHolder: "Board Title",
+        });
+        createBoard(boardFolder, extensionPath, text);
+      }
+    }
+  );
 }
 
 function createBoard(
   boardFolder: string,
   extensionPath: string,
-  inputPromise: Promise<vscode.QuickPickItem>
+  value: string | undefined
 ) {
-  inputPromise.then(
-    (value) => {
-      if (value === null || !value || value.label === "") {
-        return false;
-      }
-      // Replace empty space with underscore
-      let boardName = value.label.replace(/\s/g, "_");
-      let dir = path.join(boardFolder, boardName);
+  if (value === null || value === "" || !value) {
+    return false;
+  }
+  // Replace empty space with underscore
+  let boardName = value.replace(/\s/g, "_");
+  let dir = path.join(boardFolder, boardName);
 
-      let boardConfigFile = path.join(dir, "config.json");
+  let boardConfigFile = path.join(dir, "config.json");
 
-      fs.ensureDirSync(dir);
-      fs.ensureFileSync(boardConfigFile);
-      let config: Board = fs.readJSONSync(boardConfigFile, { throws: false });
-      if (!config) {
-        config = {
-          ...defaultBoardConfig,
-          boardName: value.label,
-          createdDate: moment().toISOString(),
-        };
-        fs.writeJsonSync(boardConfigFile, config);
-      }
-      ReactPanel.createOrShow(extensionPath);
-      ReactPanel.getPanel()?.webview.postMessage({
-        action: ACTION.fetchJson,
-        data: config,
-      });
-    },
-    (e) => {
-      if (e === "isEmpty") {
-        vscode.window.showErrorMessage("Don't leave board name blank");
-      }
-    }
-  );
+  fs.ensureDirSync(dir);
+  fs.ensureFileSync(boardConfigFile);
+  let config: Board = fs.readJSONSync(boardConfigFile, { throws: false });
+  if (!config) {
+    config = {
+      ...defaultBoardConfig,
+      boardName: value,
+      createdDate: moment().toISOString(),
+    };
+    fs.writeJsonSync(boardConfigFile, config);
+  }
+  ReactPanel.createOrShow(extensionPath);
+  ReactPanel.getPanel()?.webview.postMessage({
+    action: ACTION.fetchJson,
+    data: config,
+  });
 }
