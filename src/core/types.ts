@@ -1,3 +1,4 @@
+import { QuickPickItem } from "vscode";
 export interface Task {
   id: string;
   createdDate: string;
@@ -17,4 +18,11 @@ export interface Board {
   tasks: { [key: string]: Task };
   columns: { [key: string]: Column };
   columnsOrder: string[];
+}
+export interface QuickPickParameters<T extends QuickPickItem> {
+  title: string;
+  items: T[];
+  activeItem?: T;
+  placeholder: string;
+  defaultItems?: T[];
 }
