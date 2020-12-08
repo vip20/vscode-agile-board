@@ -30,16 +30,17 @@ const BoardColumnWrapper = styled.div`
 `;
 
 // Create styles for BoardColumnTitle element
-const BoardColumnTitle = styled.h2`
-  margin-bottom: 12px;
+const BoardColumnTitle = styled.div`
   display: flex;
   justify-content: space-between;
   h2 {
+    flex: 0 0 80%;
+    padding: 2%;
+    border: 1px solid transparent;
+    border-radius: 4px;
     font: 14px sans-serif;
     font-weight: 600;
-    &:hover {
-      cursor: pointer;
-    }
+    cursor: default;
   }
 `;
 

@@ -2,14 +2,15 @@ import * as path from "path";
 import { ACTION } from "../core/constants";
 import ReactPanel from "./reactPanel";
 import { updateConfigJson } from "./utils";
-import { window, Disposable } from "vscode";
+import { window, Disposable, WebviewPanel } from "vscode";
 
 // Handle messages from the webview
 export default function handleMessages(
+  panel: WebviewPanel,
   boardFolder: string,
   _disposables: Disposable[]
 ) {
-  ReactPanel.getPanel()?.webview.onDidReceiveMessage(
+  panel.webview.onDidReceiveMessage(
     (message) => {
       switch (message.action) {
         case ACTION.alert:

@@ -64,7 +64,7 @@ export default class ReactPanel {
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-    handleMessages(boardFolder, this._disposables);
+    handleMessages(this._panel, boardFolder, this._disposables);
   }
 
   public doRefactor() {
