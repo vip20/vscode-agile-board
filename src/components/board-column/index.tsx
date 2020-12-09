@@ -21,8 +21,11 @@ type BoardColumnContentStylesProps = {
 const BoardColumnWrapper = styled.div`
   flex: 1;
   padding: 8px;
-  background-color: var(--vscode-editorGroup-dropBackground);
+  /* background-color: var(--vscode-editorGroup-dropBackground); */
+  background: none;
   border-radius: 4px;
+  min-width: 213px;
+  overflow-x: scroll;
 
   & + & {
     margin-left: 12px;
@@ -35,10 +38,10 @@ const BoardColumnTitle = styled.div`
   justify-content: space-between;
   h2 {
     flex: 0 0 80%;
-    padding: 2%;
+    /* padding: 2%; */
     border: 1px solid transparent;
     border-radius: 4px;
-    font: 14px sans-serif;
+    font: 24px sans-serif;
     font-weight: 600;
     cursor: default;
   }
@@ -48,7 +51,7 @@ const BoardColumnTitle = styled.div`
 const BoardColumnContent = styled.div<BoardColumnContentStylesProps>`
   min-height: 20px;
   background-color: ${(props) =>
-    props.isDraggingOver ? "var(--vscode-editor-selectionBackground)" : null};
+    props.isDraggingOver ? "var(--vscode-editorGroup-dropBackground)" : null};
   border-radius: 4px;
 `;
 

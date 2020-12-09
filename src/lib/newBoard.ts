@@ -7,7 +7,11 @@ import {
   getDirectories,
   showQuickPick,
 } from "./utils";
-import { ACTION, defaultBoardConfig } from "../../src/core/constants";
+import {
+  ACTION,
+  BLANK_SPACE_ALTERNATIVE,
+  defaultBoardConfig,
+} from "../../src/core/constants";
 import { Board } from "../../src/core/types";
 import ReactPanel from "./reactPanel";
 const moment = require("moment");
@@ -61,7 +65,7 @@ function createBoard(
     return false;
   }
   // Replace empty space with underscore
-  let boardName = value.replace(/\s/g, "_");
+  let boardName = value.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
   let dir = path.join(boardFolder, boardName);
 
   let boardConfigFile = path.join(dir, "config.json");
@@ -78,7 +82,8 @@ function createBoard(
     fs.writeJsonSync(boardConfigFile, config);
   }
   ReactPanel.createOrShow(extensionPath);
-  ReactPanel.getPanel()?.webview.postMessage({
+  ReactPanel.panel.title = `VSAgile: ${value}`;
+  ReactPanel.panel.webview.postMessage({
     action: ACTION.fetchJson,
     data: config,
   });

@@ -12,15 +12,13 @@ export default class ReactPanel {
    */
   public static currentPanel: ReactPanel | undefined;
 
+  public static panel: vscode.WebviewPanel;
+
   private static readonly viewType = "vsagile";
 
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionPath: string;
   private _disposables: vscode.Disposable[] = [];
-
-  public static getPanel() {
-    return ReactPanel.currentPanel?._panel;
-  }
 
   public static createOrShow(extensionPath: string) {
     const column = vscode.window.activeTextEditor
@@ -37,6 +35,7 @@ export default class ReactPanel {
         column || vscode.ViewColumn.One
       );
     }
+    ReactPanel.panel = ReactPanel.currentPanel._panel;
   }
 
   private constructor(extensionPath: string, column: vscode.ViewColumn) {

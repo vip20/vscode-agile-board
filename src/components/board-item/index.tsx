@@ -18,15 +18,17 @@ type BoardItemStylesProps = {
 // Create style for board item element
 const BoardItemEl = styled.div<BoardItemStylesProps>`
   padding: 8px;
+  min-height: 100px;
+  margin-bottom: 12px;
   background-color: ${(props) =>
     props.isDragging
       ? "var(--vscode-editorGroup-dropBackground)"
-      : "var(--vscode-editor-background)"};
+      : "var(--vscode-tab-inactiveBackground)"};
   border-radius: 4px;
   transition: background-color 0.25s ease-out;
 
   &:hover {
-    background-color: var(--vscode-tab-activeBackground);
+    background-color: var(--vscode-editorGroupHeader-tabsBackground);
   }
 
   & + & {
@@ -46,7 +48,7 @@ export default function BoardItem(props: BoardItemProps) {
           isDragging={snapshot.isDragging}
         >
           {/* The content of the BoardItem */}
-          {props.task.description}
+          <h3>{props.task.description}</h3>
         </BoardItemEl>
       )}
     </Draggable>

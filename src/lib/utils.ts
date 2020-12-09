@@ -4,6 +4,7 @@ import * as fs from "fs-extra";
 import * as types from "../core/types";
 import { window, QuickPickItem, Disposable, QuickInput } from "vscode";
 import { QuickPickParameters } from "../core/types";
+import { BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 
 // Resolves the home tilde.
 export function resolveHome(filepath: string) {
@@ -44,7 +45,7 @@ export function getDirectories(source: string) {
   return fs
     .readdirSync(source, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name);
+    .map((dirent) => dirent.name.replace(BLANK_SPACE_ALTERNATIVE, " "));
 }
 let current: QuickInput;
 
@@ -90,4 +91,8 @@ export async function showQuickPick<
   } finally {
     disposables.forEach((d) => d.dispose());
   }
+}
+
+export function updateDirName(fromDir: string, toDir: string) {
+  fs.renameSync(fromDir, toDir);
 }

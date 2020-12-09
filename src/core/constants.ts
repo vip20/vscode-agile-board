@@ -34,4 +34,7 @@ export const ACTION = {
   refactor: "refactor",
   updateJson: "updateJson",
   fetchJson: "fetchJson",
+  renameBoard: "renameBoard",
 };
+
+export const BLANK_SPACE_ALTERNATIVE = "_";

@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
 import { ACTION, defaultBoardConfig } from "../../core/constants";
 import * as types from "../../core/types";
+import { AiOutlineEdit } from "react-icons/ai";
 
 // Create styles board element properties
 const BoardEl = styled.div`
@@ -13,14 +14,36 @@ const BoardEl = styled.div`
   justify-content: space-between;
   padding: 12px;
 `;
+const BoardInput = styled.input`
+  color: var(--vscode-input-foreground);
+  background-color: var(--vscode-input-background);
+  font-size: 0.8em;
+  border: none;
+  text-align: center;
+  &:focus {
+    outline: none;
+  }
+`;
 const BoardName = styled.h1`
   text-align: center;
-  text-transform: capitalize;
+  .edit-icon {
+    vertical-align: middle;
+    margin-left: 8px;
+    visibility: hidden;
+    cursor: pointer;
+  }
+  &:hover {
+    .edit-icon {
+      visibility: visible;
+    }
+  }
 `;
 
 export default function Board({ configJson, vscodeApi }: any) {
   // Initialize board state with board data
   const [boardData, setBoardData] = useState(defaultBoardConfig);
+  const [isEdit, setEdit] = useState(false);
+  const [boardName, setBoardName] = useState("");
   useEffect(() => {
     // Update board when configJson changes from input
     setBoardData(configJson);
@@ -43,6 +66,10 @@ export default function Board({ configJson, vscodeApi }: any) {
       board: data.boardName,
       data: data,
     });
+    updateState(data);
+  }
+
+  function updateState(data: types.Board) {
     // Save state of the current webview;
     vscodeApi.setState(data);
     setBoardData(data);
@@ -123,9 +150,63 @@ export default function Board({ configJson, vscodeApi }: any) {
     }
   }
 
+  function updateBoardName(boardName: string) {
+    setEdit(false);
+    if (boardName) {
+      let newState = { ...boardData, boardName: boardName };
+      vscodeApi.postMessage({
+        action: ACTION.renameBoard,
+        from: boardData.boardName,
+        to: boardName,
+        data: newState,
+      });
+      updateState(newState);
+    } else {
+      setBoardName(boardData.boardName);
+    }
+  }
+
+  function handleKeyDown(
+    event: React.KeyboardEvent<HTMLInputElement>,
+    callback: Function
+  ) {
+    if (event.key === "Enter") {
+      callback();
+    }
+  }
+
   return (
     <div>
-      <BoardName>{boardData.boardName}</BoardName>
+      <BoardName className="board-name">
+        {isEdit ? (
+          <BoardInput
+            type="text"
+            autoFocus
+            value={boardName}
+            onChange={(e) => setBoardName(e.target.value)}
+            onKeyDown={(e) =>
+              handleKeyDown(e, () => updateBoardName(boardName))
+            }
+            onBlur={() => {
+              updateBoardName(boardName);
+            }}
+          />
+        ) : (
+          <span>
+            {boardData.boardName}
+            <span
+              className="edit-icon"
+              title="Edit Board Name"
+              onClick={() => {
+                setEdit(true);
+                setBoardName(boardData.boardName);
+              }}
+            >
+              <AiOutlineEdit />
+            </span>
+          </span>
+        )}
+      </BoardName>
       <BoardEl>
         {/* Create context for drag & drop */}
         <DragDropContext onDragEnd={onDragEnd}>

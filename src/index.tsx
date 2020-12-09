@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { Board } from "./core/types";
-import "./index.css";
+import "./index.scss";
 
 declare global {
   interface Window {
