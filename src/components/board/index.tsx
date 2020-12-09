@@ -13,6 +13,10 @@ const BoardEl = styled.div`
   justify-content: space-between;
   padding: 12px;
 `;
+const BoardName = styled.h1`
+  text-align: center;
+  text-transform: capitalize;
+`;
 
 export default function Board({ configJson, vscodeApi }: any) {
   // Initialize board state with board data
@@ -120,21 +124,26 @@ export default function Board({ configJson, vscodeApi }: any) {
   }
 
   return (
-    <BoardEl>
-      {/* Create context for drag & drop */}
-      <DragDropContext onDragEnd={onDragEnd}>
-        {/* Get all columns in the order specified in 'board-initial-data.ts' */}
-        {boardData.columnsOrder.map((columnId: any) => {
-          // Get id of the current column
-          const column: types.Column = (boardData.columns as any)[columnId];
-          // Get item belonging to the current column
-          const tasks = column.tasksIds.map(
-            (taskId: string) => (boardData.tasks as any)[taskId]
-          );
-          // Render the BoardColumn component
-          return <BoardColumn key={column.id} column={column} tasks={tasks} />;
-        })}
-      </DragDropContext>
-    </BoardEl>
+    <div>
+      <BoardName>{boardData.boardName}</BoardName>
+      <BoardEl>
+        {/* Create context for drag & drop */}
+        <DragDropContext onDragEnd={onDragEnd}>
+          {/* Get all columns in the order specified in 'board-initial-data.ts' */}
+          {boardData.columnsOrder.map((columnId: any) => {
+            // Get id of the current column
+            const column: types.Column = (boardData.columns as any)[columnId];
+            // Get item belonging to the current column
+            const tasks = column.tasksIds.map(
+              (taskId: string) => (boardData.tasks as any)[taskId]
+            );
+            // Render the BoardColumn component
+            return (
+              <BoardColumn key={column.id} column={column} tasks={tasks} />
+            );
+          })}
+        </DragDropContext>
+      </BoardEl>
+    </div>
   );
 }
