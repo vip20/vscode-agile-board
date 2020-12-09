@@ -35,6 +35,7 @@ export const ACTION = {
   updateJson: "updateJson",
   fetchJson: "fetchJson",
   renameBoard: "renameBoard",
+  allDirectories: "allDirectories",
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";

@@ -1,7 +1,7 @@
 import * as path from "path";
 import { ACTION, BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 import ReactPanel from "./reactPanel";
-import { updateConfigJson, updateDirName } from "./utils";
+import { getDirectories, updateConfigJson, updateDirName } from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
 
 // Handle messages from the webview
@@ -27,6 +27,10 @@ export default function handleMessages(
           ReactPanel.panel.title = `VSAgile: ${message.to}`;
           updateDirName(fromDir, toDir);
           updateConfigJson(toDir, message.data);
+          ReactPanel.panel.webview.postMessage({
+            action: ACTION.allDirectories,
+            data: getDirectories(boardFolder),
+          });
           return;
       }
     },

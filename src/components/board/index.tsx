@@ -7,6 +7,9 @@ import { ACTION, defaultBoardConfig } from "../../core/constants";
 import * as types from "../../core/types";
 import { AiOutlineEdit } from "react-icons/ai";
 
+type BoardInputProps = {
+  isError: boolean;
+};
 // Create styles board element properties
 const BoardEl = styled.div`
   display: flex;
@@ -14,11 +17,18 @@ const BoardEl = styled.div`
   justify-content: space-between;
   padding: 12px;
 `;
-const BoardInput = styled.input`
-  color: var(--vscode-input-foreground);
-  background-color: var(--vscode-input-background);
+const BoardInput = styled.input<BoardInputProps>`
+  background-color: ${(props) =>
+    props.isError
+      ? "var(--vscode-inputValidation-errorBackground)"
+      : "var(--vscode-input-background)"};
+  color: ${(props) =>
+    props.isError
+      ? "var(--vscode-inputValidation-errorForeground)"
+      : "var(--vscode-input-foreground)"};
   font-size: 0.8em;
-  border: none;
+  border: ${(props) =>
+    props.isError ? "var(--vscode-inputValidation-errorBorder)" : "none"};
   text-align: center;
   &:focus {
     outline: none;
@@ -37,9 +47,19 @@ const BoardName = styled.h1`
       visibility: visible;
     }
   }
+  .input-error {
+    padding: 0 30px 0 50px;
+    transition: 0.28s;
+    /* font-style: italic; */
+    font-size: 16px;
+  }
 `;
 
-export default function Board({ configJson, vscodeApi }: any) {
+export default function Board({
+  configJson,
+  vscodeApi,
+  allDirectoryNames,
+}: any) {
   // Initialize board state with board data
   const [boardData, setBoardData] = useState(defaultBoardConfig);
   const [isEdit, setEdit] = useState(false);
@@ -149,10 +169,21 @@ export default function Board({ configJson, vscodeApi }: any) {
       updateJsonConfig(newState);
     }
   }
+  const [isNameError, setNameError] = useState(false);
+  useEffect(() => {
+    const filteredDir: string[] = allDirectoryNames.filter(
+      (x: string) => x !== boardData.boardName
+    );
+    if (filteredDir.indexOf(boardName) !== -1) {
+      setNameError(true);
+    } else {
+      setNameError(false);
+    }
+  }, [boardName, allDirectoryNames]);
 
   function updateBoardName(boardName: string) {
     setEdit(false);
-    if (boardName) {
+    if (boardName && !isNameError) {
       let newState = { ...boardData, boardName: boardName };
       vscodeApi.postMessage({
         action: ACTION.renameBoard,
@@ -175,32 +206,41 @@ export default function Board({ configJson, vscodeApi }: any) {
     }
   }
 
+  function onBoardEdit() {
+    setEdit(true);
+    setBoardName(boardData.boardName);
+  }
   return (
     <div>
       <BoardName className="board-name">
         {isEdit ? (
-          <BoardInput
-            type="text"
-            autoFocus
-            value={boardName}
-            onChange={(e) => setBoardName(e.target.value)}
-            onKeyDown={(e) =>
-              handleKeyDown(e, () => updateBoardName(boardName))
-            }
-            onBlur={() => {
-              updateBoardName(boardName);
-            }}
-          />
+          <>
+            <BoardInput
+              isError={isNameError}
+              type="text"
+              autoFocus
+              value={boardName}
+              onChange={(e) => setBoardName(e.target.value)}
+              onKeyDown={(e) =>
+                handleKeyDown(e, () => updateBoardName(boardName))
+              }
+              onBlur={() => {
+                updateBoardName(boardName);
+              }}
+            />{" "}
+            {isNameError && (
+              <div className="input-error">
+                Board by name "{boardName}" already exists.
+              </div>
+            )}
+          </>
         ) : (
           <span>
             {boardData.boardName}
             <span
               className="edit-icon"
               title="Edit Board Name"
-              onClick={() => {
-                setEdit(true);
-                setBoardName(boardData.boardName);
-              }}
+              onClick={onBoardEdit}
             >
               <AiOutlineEdit />
             </span>

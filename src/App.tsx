@@ -6,11 +6,17 @@ import * as types from "./core/types";
 declare const vscodeApi: any;
 export default function App() {
   const [configJson, _setConfigJson] = useState(defaultBoardConfig);
+  const [allDirectories, _setAllDirectories] = useState<string[]>([]);
   const configRef = useRef<types.Board>(configJson);
+  const dirRef = useRef<string[]>(allDirectories);
 
   const setConfigJson = (data: types.Board) => {
     configRef.current = data;
     _setConfigJson(configRef.current);
+  };
+  const setAllDirectories = (data: string[]) => {
+    dirRef.current = data;
+    _setAllDirectories(dirRef.current);
   };
 
   const handleMsgEvent = useCallback((event: any) => {
@@ -19,6 +25,9 @@ export default function App() {
       switch (message.action) {
         case ACTION.fetchJson:
           setConfigJson(message.data);
+          break;
+        case ACTION.allDirectories:
+          setAllDirectories(message.data);
           break;
       }
     }
@@ -32,7 +41,11 @@ export default function App() {
 
   return (
     <>
-      <Board configJson={configJson} vscodeApi={vscodeApi}></Board>
+      <Board
+        configJson={configJson}
+        vscodeApi={vscodeApi}
+        allDirectoryNames={allDirectories}
+      ></Board>
     </>
   );
 }

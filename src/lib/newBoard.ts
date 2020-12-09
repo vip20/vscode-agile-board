@@ -15,6 +15,7 @@ import {
 import { Board } from "../../src/core/types";
 import ReactPanel from "./reactPanel";
 const moment = require("moment");
+let allDirectories: string[] = [];
 export default function newBoard(boardFolder: string, extensionPath: string) {
   if (boardFolder == null || !boardFolder) {
     vscode.window.showErrorMessage(
@@ -25,9 +26,8 @@ export default function newBoard(boardFolder: string, extensionPath: string) {
   quickPick(boardFolder, extensionPath);
 }
 function quickPick(boardFolder: string, extensionPath: string) {
-  const quickPickItems: vscode.QuickPickItem[] = getDirectories(
-    boardFolder
-  ).map((x) => ({
+  allDirectories = getDirectories(boardFolder);
+  const quickPickItems: vscode.QuickPickItem[] = allDirectories.map((x) => ({
     label: x,
   }));
   quickPickItems.unshift({
@@ -86,5 +86,9 @@ function createBoard(
   ReactPanel.panel.webview.postMessage({
     action: ACTION.fetchJson,
     data: config,
+  });
+  ReactPanel.panel.webview.postMessage({
+    action: ACTION.allDirectories,
+    data: allDirectories,
   });
 }
