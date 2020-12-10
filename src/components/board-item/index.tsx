@@ -6,7 +6,8 @@ import { Task } from "../../core/types";
 // Define types for board item element properties
 type BoardItemProps = {
   index: number;
-  task: Task;
+  style: Object;
+  data: Task[];
 };
 
 // Define types for board item element style properties
@@ -16,7 +17,7 @@ type BoardItemStylesProps = {
 };
 
 // Create style for board item element
-const BoardItemEl = styled.div<BoardItemStylesProps>`
+export const BoardItemEl = styled.div<BoardItemStylesProps>`
   padding: 8px;
   min-height: 100px;
   margin-bottom: 12px;
@@ -26,9 +27,11 @@ const BoardItemEl = styled.div<BoardItemStylesProps>`
       : "var(--vscode-tab-inactiveBackground)"};
   border-radius: 4px;
   transition: background-color 0.25s ease-out;
+  border: 1px solid transparent;
 
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
+    border-color: var(--vscode-editor-foreground);
   }
 
   & + & {
@@ -37,20 +40,26 @@ const BoardItemEl = styled.div<BoardItemStylesProps>`
 `;
 
 // Create and export the BoardItem component
-export default function BoardItem(props: BoardItemProps) {
-  return (
-    <Draggable draggableId={props.task.id} index={props.index}>
-      {(provided, snapshot) => (
-        <BoardItemEl
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-          isDragging={snapshot.isDragging}
-        >
-          {/* The content of the BoardItem */}
-          <h3>{props.task.description}</h3>
-        </BoardItemEl>
-      )}
-    </Draggable>
-  );
-}
+export const BoardItem = React.memo(
+  ({ data, index, style }: BoardItemProps) => {
+    const task: Task = data[index];
+    if (!task) {
+      return null;
+    }
+    return (
+      <Draggable draggableId={task.id} index={index}>
+        {(provided, snapshot) => (
+          <BoardItemEl
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            ref={provided.innerRef}
+            isDragging={snapshot.isDragging}
+          >
+            {/* The content of the BoardItem */}
+            <h3>{task.description}</h3>
+          </BoardItemEl>
+        )}
+      </Draggable>
+    );
+  }
+);

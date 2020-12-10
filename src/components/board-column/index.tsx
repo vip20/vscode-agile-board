@@ -1,28 +1,31 @@
 import * as React from "react";
-import { Droppable } from "react-beautiful-dnd";
+import {
+  DraggableProvided,
+  DraggableRubric,
+  DraggableStateSnapshot,
+  Droppable,
+} from "react-beautiful-dnd";
 import styled from "@emotion/styled";
-import BoardItem from "../board-item";
+import { BoardItem, BoardItemEl } from "../board-item";
 import { Column, Task } from "../../core/types";
+import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
+import { useLayoutEffect, useRef } from "react";
 
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
   column: Column;
   tasks: Task[];
-};
-
-// Define types for board column content style properties
-// This is necessary for TypeScript to accept the 'isDraggingOver' prop.
-type BoardColumnContentStylesProps = {
-  isDraggingOver: boolean;
+  index: number;
 };
 
 // Create styles for BoardColumnWrapper element
 const BoardColumnWrapper = styled.div`
-  flex: 1;
+  /* flex: 1; */
   padding: 8px;
   /* background-color: var(--vscode-editorGroup-dropBackground); */
-  background: none;
+  background-color: #3c3c3c3d;
+  /* background: none; */
   border-radius: 4px;
   min-width: 213px;
   overflow-x: scroll;
@@ -47,16 +50,14 @@ const BoardColumnTitle = styled.div`
   }
 `;
 
-// Create styles for BoardColumnContent element
-const BoardColumnContent = styled.div<BoardColumnContentStylesProps>`
-  min-height: 20px;
-  background-color: ${(props) =>
-    props.isDraggingOver ? "var(--vscode-editorGroup-dropBackground)" : null};
-  border-radius: 4px;
-`;
+function getBackgroundColor(isDraggingOver: boolean) {
+  return isDraggingOver
+    ? "var(--vscode-editorGroup-dropBackground)"
+    : "transparent";
+}
 
 // Create and export the BoardColumn component
-export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
+export const BoardColumn: React.FC<BoardColumnProps> = React.memo((props) => {
   return (
     <BoardColumnWrapper>
       {/* Title of the column */}
@@ -64,21 +65,50 @@ export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
         <h2>{props.column.title}</h2>
       </BoardColumnTitle>
 
-      <Droppable droppableId={props.column.id}>
-        {(provided, snapshot) => (
-          <BoardColumnContent
-            {...provided.droppableProps}
+      <Droppable
+        droppableId={props.column.id}
+        mode="virtual"
+        renderClone={(
+          provided: DraggableProvided,
+          snapshot: DraggableStateSnapshot,
+          rubric: DraggableRubric
+        ) => (
+          <BoardItemEl
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
             ref={provided.innerRef}
-            isDraggingOver={snapshot.isDraggingOver}
+            isDragging={snapshot.isDragging}
           >
-            {/* All board items belong into specific column. */}
-            {props.tasks.map((task: any, index: number) => (
-              <BoardItem key={task.id} task={task} index={index} />
-            ))}
-            {provided.placeholder}
-          </BoardColumnContent>
+            {/* The content of the BoardItem */}
+            <h3>{props.tasks[rubric.source.index].description}</h3>
+          </BoardItemEl>
         )}
+      >
+        {(provided, snapshot) => {
+          const itemCount: number = snapshot.isUsingPlaceholder
+            ? props.tasks.length + 1
+            : props.tasks.length;
+
+          return (
+            <FixedSizeList
+              height={500}
+              itemCount={itemCount}
+              itemSize={110}
+              width={300}
+              outerRef={provided.innerRef}
+              style={{
+                backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
+                transition: "background-color 0.2s ease",
+                // We add this spacing so that when we drop into an empty list we will animate to the correct visual position.
+                // padding: grid,
+              }}
+              itemData={props.tasks}
+            >
+              {BoardItem}
+            </FixedSizeList>
+          );
+        }}
       </Droppable>
     </BoardColumnWrapper>
   );
-};
+});

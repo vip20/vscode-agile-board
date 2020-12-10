@@ -6,6 +6,7 @@ import { BoardColumn } from "../board-column";
 import { ACTION, defaultBoardConfig } from "../../core/constants";
 import * as types from "../../core/types";
 import { AiOutlineEdit } from "react-icons/ai";
+import { reorderList } from "../../core/helpers";
 
 type BoardInputProps = {
   isError: boolean;
@@ -14,7 +15,7 @@ type BoardInputProps = {
 const BoardEl = styled.div`
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 12px;
 `;
 const BoardInput = styled.input<BoardInputProps>`
@@ -95,79 +96,81 @@ export default function Board({
     setBoardData(data);
   }
 
-  // Handle drag & drop
   function onDragEnd(result: any) {
-    const { source, destination, draggableId } = result;
-    // Do nothing if item is dropped outside the list
-    if (!destination) {
+    if (!result.destination) {
       return;
     }
-    // Do nothing if the item is dropped into the same place
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
+
+    if (result.type === "column") {
+      // if the list is scrolled it looks like there is some strangeness going on
+      // with react-window. It looks to be scrolling back to scroll: 0
+      // I should log an issue with the project
+      const columnsOrder = reorderList(
+        boardData.columnsOrder,
+        result.source.index,
+        result.destination.index
+      );
+      updateJsonConfig({
+        ...boardData,
+        columnsOrder,
+      });
       return;
     }
-    // Find column from which the item was dragged from
-    const columnStart = (boardData.columns as any)[source.droppableId];
-    // Find column in which the item was dropped
-    const columnFinish = (boardData.columns as any)[destination.droppableId];
-    // Moving items in the same list
-    if (columnStart === columnFinish) {
-      // Get all item ids in currently active list
-      const newTaskIds = Array.from(columnStart.tasksIds);
-      // Remove the id of dragged item from its original position
-      newTaskIds.splice(source.index, 1);
-      // Insert the id of dragged item to the new position
-      newTaskIds.splice(destination.index, 0, draggableId);
-      // Create new, updated, object with data for columns
-      const newColumnStart: types.Column = {
-        ...columnStart,
-        tasksIds: newTaskIds,
-      };
-      // Create new board state with updated data for columns
-      const newState = {
+
+    // reordering in same list
+    if (result.source.droppableId === result.destination.droppableId) {
+      const column = boardData.columns[result.source.droppableId];
+      const tasksIds = reorderList(
+        column.tasksIds,
+        result.source.index,
+        result.destination.index
+      );
+
+      // updating column entry
+      const newState: types.Board = {
         ...boardData,
         columns: {
           ...boardData.columns,
-          [newColumnStart.id]: newColumnStart,
+          [column.id]: {
+            ...column,
+            tasksIds,
+          },
         },
       };
-      // Update the board state with new data
       updateJsonConfig(newState);
-    } else {
-      // Moving items from one list to another
-      // Get all item ids in source list
-      const newStartTaskIds = Array.from(columnStart.tasksIds);
-      // Remove the id of dragged item from its original position
-      newStartTaskIds.splice(source.index, 1);
-      // Create new, updated, object with data for source column
-      const newColumnStart: types.Column = {
-        ...columnStart,
-        tasksIds: newStartTaskIds,
-      };
-      // Get all item ids in destination list
-      const newFinishTaskIds = Array.from(columnFinish.tasksIds);
-      // Insert the id of dragged item to the new position in destination list
-      newFinishTaskIds.splice(destination.index, 0, draggableId);
-      // Create new, updated, object with data for destination column
-      const newColumnFinish: types.Column = {
-        ...columnFinish,
-        tasksIds: newFinishTaskIds,
-      };
-      // Create new board state with updated data for both, source and destination columns
-      const newState = {
-        ...boardData,
-        columns: {
-          ...boardData.columns,
-          [newColumnStart.id]: newColumnStart,
-          [newColumnFinish.id]: newColumnFinish,
-        },
-      };
-      // Update the board state with new data
-      updateJsonConfig(newState);
+      return;
     }
+
+    // moving between lists
+    const sourceColumn = boardData.columns[result.source.droppableId];
+    const destinationColumn = boardData.columns[result.destination.droppableId];
+    const item = sourceColumn.tasksIds[result.source.index];
+
+    // 1. remove item from source column
+    const newSourceColumn: types.Column = {
+      ...sourceColumn,
+      tasksIds: [...sourceColumn.tasksIds],
+    };
+    newSourceColumn.tasksIds.splice(result.source.index, 1);
+
+    // 2. insert into destination column
+    const newDestinationColumn: types.Column = {
+      ...destinationColumn,
+      tasksIds: [...destinationColumn.tasksIds],
+    };
+    // in line modification of items
+    newDestinationColumn.tasksIds.splice(result.destination.index, 0, item);
+
+    const newState: types.Board = {
+      ...boardData,
+      columns: {
+        ...boardData.columns,
+        [newSourceColumn.id]: newSourceColumn,
+        [newDestinationColumn.id]: newDestinationColumn,
+      },
+    };
+
+    updateJsonConfig(newState);
   }
   const [isNameError, setNameError] = useState(false);
   useEffect(() => {
@@ -251,7 +254,7 @@ export default function Board({
         {/* Create context for drag & drop */}
         <DragDropContext onDragEnd={onDragEnd}>
           {/* Get all columns in the order specified in 'board-initial-data.ts' */}
-          {boardData.columnsOrder.map((columnId: any) => {
+          {boardData.columnsOrder.map((columnId: any, index: number) => {
             // Get id of the current column
             const column: types.Column = (boardData.columns as any)[columnId];
             // Get item belonging to the current column
@@ -260,7 +263,12 @@ export default function Board({
             );
             // Render the BoardColumn component
             return (
-              <BoardColumn key={column.id} column={column} tasks={tasks} />
+              <BoardColumn
+                key={column.id}
+                column={column}
+                tasks={tasks}
+                index={index}
+              />
             );
           })}
         </DragDropContext>
