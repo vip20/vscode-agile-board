@@ -17,7 +17,11 @@ export default function handleMessages(
           window.showErrorMessage(message.data);
           return;
         case ACTION.updateJson:
-          updateConfigJson(path.join(boardFolder, message.board), message.data);
+          let dirPath = path.join(
+            boardFolder,
+            message.board.replace(/\s/g, BLANK_SPACE_ALTERNATIVE)
+          );
+          updateConfigJson(dirPath, message.data);
           return;
         case ACTION.renameBoard:
           let toValue = message.to.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
