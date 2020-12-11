@@ -6,29 +6,30 @@ import {
   Droppable,
 } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
-import { BoardItem, BoardItemEl } from "../board-item";
-import { Column, Task } from "../../core/types";
+import { BoardItem, Task } from "../board-item";
+import * as types from "../../core/types";
 import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
 import { useLayoutEffect, useRef } from "react";
 
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
-  column: Column;
-  tasks: Task[];
+  column: types.Column;
+  tasks: types.Task[];
   index: number;
 };
 
 // Create styles for BoardColumnWrapper element
 const BoardColumnWrapper = styled.div`
   /* flex: 1; */
-  padding: 8px;
+  padding: 8px 0;
   /* background-color: var(--vscode-editorGroup-dropBackground); */
   background-color: #3c3c3c3d;
   /* background: none; */
   border-radius: 4px;
-  min-width: 213px;
-  overflow-x: scroll;
+  min-width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   & + & {
     margin-left: 12px;
@@ -73,15 +74,11 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo((props) => {
           snapshot: DraggableStateSnapshot,
           rubric: DraggableRubric
         ) => (
-          <BoardItemEl
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            ref={provided.innerRef}
+          <Task
+            provided={provided}
             isDragging={snapshot.isDragging}
-          >
-            {/* The content of the BoardItem */}
-            <h3>{props.tasks[rubric.source.index].description}</h3>
-          </BoardItemEl>
+            task={props.tasks[rubric.source.index]}
+          />
         )}
       >
         {(provided, snapshot) => {
@@ -91,7 +88,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo((props) => {
 
           return (
             <FixedSizeList
-              height={500}
+              height={600}
               itemCount={itemCount}
               itemSize={110}
               width={300}
