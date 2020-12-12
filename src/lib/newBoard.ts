@@ -15,7 +15,9 @@ import {
 import { Board } from "../../src/core/types";
 import ReactPanel from "./reactPanel";
 const moment = require("moment");
+
 let allDirectories: string[] = [];
+
 export default function newBoard(boardFolder: string, extensionPath: string) {
   if (boardFolder == null || !boardFolder) {
     vscode.window.showErrorMessage(

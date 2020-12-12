@@ -22,7 +22,7 @@ export default function () {
             const update = noteFolder.update(
               "defaultBoardPath",
               path.normalize(res[0].fsPath),
-              true
+              vscode.ConfigurationTarget.Global
             );
             update.then(() => {
               vscode.window.showInformationMessage(

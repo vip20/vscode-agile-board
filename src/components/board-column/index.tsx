@@ -1,31 +1,36 @@
 import * as React from "react";
-import { Droppable } from "react-beautiful-dnd";
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableRubric,
+  DraggableStateSnapshot,
+  Droppable,
+} from "react-beautiful-dnd";
 import styled from "@emotion/styled";
-import BoardItem from "../board-item";
-import { Column, Task } from "../../core/types";
+import { BoardItem, Task } from "../board-item";
+import * as types from "../../core/types";
+import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
+import { useLayoutEffect, useRef } from "react";
 
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
-  column: Column;
-  tasks: Task[];
-};
-
-// Define types for board column content style properties
-// This is necessary for TypeScript to accept the 'isDraggingOver' prop.
-type BoardColumnContentStylesProps = {
-  isDraggingOver: boolean;
+  column: types.Column;
+  tasks: types.Task[];
+  index: number;
 };
 
 // Create styles for BoardColumnWrapper element
 const BoardColumnWrapper = styled.div`
-  flex: 1;
-  padding: 8px;
+  /* flex: 1; */
+  padding: 8px 0;
   /* background-color: var(--vscode-editorGroup-dropBackground); */
-  background: none;
+  background-color: #3c3c3c3d;
+  /* background: none; */
   border-radius: 4px;
-  min-width: 213px;
-  overflow-x: scroll;
+  min-width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   & + & {
     margin-left: 12px;
@@ -36,49 +41,90 @@ const BoardColumnWrapper = styled.div`
 const BoardColumnTitle = styled.div`
   display: flex;
   justify-content: space-between;
+  padding: 0 16px;
   h2 {
     flex: 0 0 80%;
     /* padding: 2%; */
     border: 1px solid transparent;
     border-radius: 4px;
-    font: 24px sans-serif;
+    font: 20px sans-serif;
     font-weight: 600;
     cursor: default;
   }
 `;
 
-// Create styles for BoardColumnContent element
-const BoardColumnContent = styled.div<BoardColumnContentStylesProps>`
-  min-height: 20px;
-  background-color: ${(props) =>
-    props.isDraggingOver ? "var(--vscode-editorGroup-dropBackground)" : null};
-  border-radius: 4px;
-`;
+function getBackgroundColor(isDraggingOver: boolean) {
+  return isDraggingOver
+    ? "var(--vscode-editorGroup-dropBackground)"
+    : "transparent";
+}
 
 // Create and export the BoardColumn component
-export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
-  return (
-    <BoardColumnWrapper>
-      {/* Title of the column */}
-      <BoardColumnTitle>
-        <h2>{props.column.title}</h2>
-      </BoardColumnTitle>
-
-      <Droppable droppableId={props.column.id}>
-        {(provided, snapshot) => (
-          <BoardColumnContent
-            {...provided.droppableProps}
+export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
+  ({ column, index, tasks }: any) => {
+    return (
+      <Draggable draggableId={column.id} key={column.id} index={index}>
+        {(provided) => (
+          <BoardColumnWrapper
+            {...provided.draggableProps}
             ref={provided.innerRef}
-            isDraggingOver={snapshot.isDraggingOver}
           >
-            {/* All board items belong into specific column. */}
-            {props.tasks.map((task: any, index: number) => (
-              <BoardItem key={task.id} task={task} index={index} />
-            ))}
-            {provided.placeholder}
-          </BoardColumnContent>
+            <BoardColumnTitle {...provided.dragHandleProps}>
+              <h2>{column.title}</h2>
+            </BoardColumnTitle>
+
+            <TaskList column={column} index={index} tasks={tasks} />
+          </BoardColumnWrapper>
         )}
-      </Droppable>
-    </BoardColumnWrapper>
+      </Draggable>
+    );
+  }
+);
+
+const TaskList = React.memo(({ column, index, tasks }: any) => {
+  const listRef = useRef<any>();
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (list) {
+      list.scrollTo(0);
+    }
+  }, [index]);
+
+  return (
+    <Droppable
+      droppableId={column.id}
+      mode="virtual"
+      renderClone={(provided, snapshot, rubric) => (
+        <Task
+          provided={provided}
+          isDragging={snapshot.isDragging}
+          task={tasks[rubric.source.index]}
+        />
+      )}
+    >
+      {(provided, snapshot) => {
+        const itemCount = snapshot.isUsingPlaceholder
+          ? tasks.length + 1
+          : tasks.length;
+
+        return (
+          <FixedSizeList
+            height={500}
+            itemCount={itemCount}
+            itemSize={110}
+            width={300}
+            outerRef={provided.innerRef}
+            itemData={tasks}
+            ref={listRef}
+            style={{
+              backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
+              transition: "background-color 0.2s ease",
+            }}
+          >
+            {BoardItem}
+          </FixedSizeList>
+        );
+      }}
+    </Droppable>
   );
-};
+});
