@@ -1,8 +1,8 @@
 import { QuickPickItem } from "vscode";
 export interface Task {
   id: string;
-  createdDate: string;
-  modifiedDate: string;
+  createdDate?: string;
+  modifiedDate?: string;
   description: string;
 }
 

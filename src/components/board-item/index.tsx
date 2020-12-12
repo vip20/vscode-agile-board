@@ -2,6 +2,7 @@ import * as React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import * as types from "../../core/types";
+import { areEqual } from "react-window";
 
 // Define types for board item element properties
 type BoardItemProps = {
@@ -44,7 +45,7 @@ export const BoardItem = React.memo(
       return null;
     }
     return (
-      <Draggable draggableId={task.id} index={index}>
+      <Draggable draggableId={task.id} key={task.id} index={index}>
         {(provided, snapshot) => (
           <Task
             provided={provided}
@@ -55,7 +56,8 @@ export const BoardItem = React.memo(
         )}
       </Draggable>
     );
-  }
+  },
+  areEqual
 );
 
 export function Task({ provided, task, style, isDragging }: any) {
@@ -71,8 +73,7 @@ export function Task({ provided, task, style, isDragging }: any) {
         isDragging,
       })}
     >
-      {/* The content of the BoardItem */}
-      <h3>{task.description}</h3>
+      <h4>{task.description}</h4>
     </BoardItemEl>
   );
 }
@@ -87,13 +88,12 @@ function getStyle({ draggableStyle, virtualStyle, isDragging }: any) {
   // when dragging we want to use the draggable style for placement, otherwise use the virtual style
   const result = {
     ...combined,
-
-    left: combined.left + grid,
-    top: combined.top + grid,
-    height: combined.height - grid,
+    height: isDragging ? combined.height : combined.height - grid,
+    left: isDragging ? combined.left : combined.left + grid,
     width: isDragging
       ? draggableStyle.width
-      : `calc(${combined.width} - ${grid * 2.25}px)`,
+      : `calc(${combined.width} - ${grid * 2}px)`,
+    marginBottom: grid,
   };
 
   return result;

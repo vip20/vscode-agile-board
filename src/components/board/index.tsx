@@ -1,23 +1,16 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
 import { ACTION, defaultBoardConfig } from "../../core/constants";
-import * as types from "../../core/types";
+import * as t from "../../core/types";
 import { AiOutlineEdit } from "react-icons/ai";
 import { reorderList } from "../../core/helpers";
 
 type BoardInputProps = {
   isError: boolean;
 };
-// Create styles board element properties
-const BoardEl = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 12px;
-`;
 const BoardInput = styled.input<BoardInputProps>`
   background-color: ${(props) =>
     props.isError
@@ -62,12 +55,12 @@ export default function Board({
   allDirectoryNames,
 }: any) {
   // Initialize board state with board data
-  const [boardData, setBoardData] = useState(defaultBoardConfig);
+  const [state, setState] = useState(defaultBoardConfig);
   const [isEdit, setEdit] = useState(false);
   const [boardName, setBoardName] = useState("");
   useEffect(() => {
     // Update board when configJson changes from input
-    setBoardData(configJson);
+    setState(configJson);
     if (configJson !== defaultBoardConfig) {
       vscodeApi.setState(configJson);
     }
@@ -76,12 +69,12 @@ export default function Board({
   useEffect(() => {
     let oldState = vscodeApi.getState();
     // when there is a state available use that to display webview works when tab changes
-    if (oldState && oldState !== boardData) {
-      setBoardData(oldState);
+    if (oldState && oldState !== state) {
+      setState(oldState);
     }
   }, [vscodeApi]);
 
-  function updateJsonConfig(data: types.Board, isInit: boolean = false) {
+  function updateJsonConfig(data: t.Board, isInit: boolean = false) {
     vscodeApi.postMessage({
       action: ACTION.updateJson,
       board: data.boardName,
@@ -90,10 +83,10 @@ export default function Board({
     updateState(data);
   }
 
-  function updateState(data: types.Board) {
+  function updateState(data: t.Board) {
     // Save state of the current webview;
     vscodeApi.setState(data);
-    setBoardData(data);
+    setState(data);
   }
 
   function onDragEnd(result: any) {
@@ -106,12 +99,12 @@ export default function Board({
       // with react-window. It looks to be scrolling back to scroll: 0
       // I should log an issue with the project
       const columnsOrder = reorderList(
-        boardData.columnsOrder,
+        state.columnsOrder,
         result.source.index,
         result.destination.index
       );
       updateJsonConfig({
-        ...boardData,
+        ...state,
         columnsOrder,
       });
       return;
@@ -119,7 +112,7 @@ export default function Board({
 
     // reordering in same list
     if (result.source.droppableId === result.destination.droppableId) {
-      const column = boardData.columns[result.source.droppableId];
+      const column: t.Column = state.columns[result.source.droppableId];
       const tasksIds = reorderList(
         column.tasksIds,
         result.source.index,
@@ -127,10 +120,10 @@ export default function Board({
       );
 
       // updating column entry
-      const newState: types.Board = {
-        ...boardData,
+      const newState = {
+        ...state,
         columns: {
-          ...boardData.columns,
+          ...state.columns,
           [column.id]: {
             ...column,
             tasksIds,
@@ -142,29 +135,29 @@ export default function Board({
     }
 
     // moving between lists
-    const sourceColumn = boardData.columns[result.source.droppableId];
-    const destinationColumn = boardData.columns[result.destination.droppableId];
-    const item = sourceColumn.tasksIds[result.source.index];
+    const sourceColumn = state.columns[result.source.droppableId];
+    const destinationColumn = state.columns[result.destination.droppableId];
+    const tasksIds = sourceColumn.tasksIds[result.source.index];
 
     // 1. remove item from source column
-    const newSourceColumn: types.Column = {
+    const newSourceColumn = {
       ...sourceColumn,
       tasksIds: [...sourceColumn.tasksIds],
     };
     newSourceColumn.tasksIds.splice(result.source.index, 1);
 
     // 2. insert into destination column
-    const newDestinationColumn: types.Column = {
+    const newDestinationColumn = {
       ...destinationColumn,
       tasksIds: [...destinationColumn.tasksIds],
     };
     // in line modification of items
-    newDestinationColumn.tasksIds.splice(result.destination.index, 0, item);
+    newDestinationColumn.tasksIds.splice(result.destination.index, 0, tasksIds);
 
-    const newState: types.Board = {
-      ...boardData,
+    const newState = {
+      ...state,
       columns: {
-        ...boardData.columns,
+        ...state.columns,
         [newSourceColumn.id]: newSourceColumn,
         [newDestinationColumn.id]: newDestinationColumn,
       },
@@ -175,7 +168,7 @@ export default function Board({
   const [isNameError, setNameError] = useState(false);
   useEffect(() => {
     const filteredDir: string[] = allDirectoryNames.filter(
-      (x: string) => x !== boardData.boardName
+      (x: string) => x !== state.boardName
     );
     if (filteredDir.indexOf(boardName) !== -1) {
       setNameError(true);
@@ -187,16 +180,16 @@ export default function Board({
   function updateBoardName(boardName: string) {
     setEdit(false);
     if (boardName && !isNameError) {
-      let newState = { ...boardData, boardName: boardName };
+      let newState = { ...state, boardName: boardName };
       vscodeApi.postMessage({
         action: ACTION.renameBoard,
-        from: boardData.boardName,
+        from: state.boardName,
         to: boardName,
         data: newState,
       });
       updateState(newState);
     } else {
-      setBoardName(boardData.boardName);
+      setBoardName(state.boardName);
     }
   }
 
@@ -211,68 +204,79 @@ export default function Board({
 
   function onBoardEdit() {
     setEdit(true);
-    setBoardName(boardData.boardName);
+    setBoardName(state.boardName);
   }
   return (
-    <div>
-      <BoardName className="board-name">
-        {isEdit ? (
-          <>
-            <BoardInput
-              isError={isNameError}
-              type="text"
-              autoFocus
-              value={boardName}
-              onChange={(e) => setBoardName(e.target.value)}
-              onKeyDown={(e) =>
-                handleKeyDown(e, () => updateBoardName(boardName))
-              }
-              onBlur={() => {
-                updateBoardName(boardName);
-              }}
-            />{" "}
-            {isNameError && (
-              <div className="input-error">
-                Board by name "{boardName}" already exists.
-              </div>
-            )}
-          </>
-        ) : (
-          <span>
-            {boardData.boardName}
-            <span
-              className="edit-icon"
-              title="Edit Board Name"
-              onClick={onBoardEdit}
-            >
-              <AiOutlineEdit />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div>
+        <BoardName className="board-name">
+          {isEdit ? (
+            <>
+              <BoardInput
+                isError={isNameError}
+                type="text"
+                autoFocus
+                value={boardName}
+                onChange={(e) => setBoardName(e.target.value)}
+                onKeyDown={(e) =>
+                  handleKeyDown(e, () => updateBoardName(boardName))
+                }
+                onBlur={() => {
+                  updateBoardName(boardName);
+                }}
+              />{" "}
+              {isNameError && (
+                <div className="input-error">
+                  Board by name "{boardName}" already exists.
+                </div>
+              )}
+            </>
+          ) : (
+            <span>
+              {state.boardName}
+              <span
+                className="edit-icon"
+                title="Edit Board Name"
+                onClick={onBoardEdit}
+              >
+                <AiOutlineEdit />
+              </span>
             </span>
-          </span>
-        )}
-      </BoardName>
-      <BoardEl>
-        {/* Create context for drag & drop */}
-        <DragDropContext onDragEnd={onDragEnd}>
-          {/* Get all columns in the order specified in 'board-initial-data.ts' */}
-          {boardData.columnsOrder.map((columnId: any, index: number) => {
-            // Get id of the current column
-            const column: types.Column = (boardData.columns as any)[columnId];
-            // Get item belonging to the current column
-            const tasks = column.tasksIds.map(
-              (taskId: string) => (boardData.tasks as any)[taskId]
-            );
-            // Render the BoardColumn component
-            return (
-              <BoardColumn
-                key={column.id}
-                column={column}
-                tasks={tasks}
-                index={index}
-              />
-            );
-          })}
-        </DragDropContext>
-      </BoardEl>
-    </div>
+          )}
+        </BoardName>
+        <Droppable
+          droppableId="all-droppables"
+          direction="horizontal"
+          type="column"
+        >
+          {(provided) => (
+            <div
+              className="board-columns"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {state.columnsOrder.map((columnId: any, index: number) => {
+                // Get id of the current column
+                const column: t.Column = (state.columns as any)[columnId];
+                // Get item belonging to the current column
+                const tasks = column.tasksIds.map(
+                  (taskId: string) => (state.tasks as any)[taskId]
+                );
+                // Render the BoardColumn component
+                return (
+                  <BoardColumn
+                    key={column.id}
+                    column={column}
+                    tasks={tasks}
+                    index={index}
+                  />
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </div>
+    </DragDropContext>
   );
 }
