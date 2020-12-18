@@ -7,46 +7,11 @@ import { ACTION, defaultBoardConfig } from "../../core/constants";
 import * as t from "../../core/types";
 import { AiOutlineEdit } from "react-icons/ai";
 import { reorderList } from "../../core/helpers";
+import InputBox from "../input-box";
 
-type BoardInputProps = {
-  isError: boolean;
-};
-const BoardInput = styled.input<BoardInputProps>`
-  background-color: ${(props) =>
-    props.isError
-      ? "var(--vscode-inputValidation-errorBackground)"
-      : "var(--vscode-input-background)"};
-  color: ${(props) =>
-    props.isError
-      ? "var(--vscode-inputValidation-errorForeground)"
-      : "var(--vscode-input-foreground)"};
-  font-size: 0.8em;
-  border: ${(props) =>
-    props.isError ? "var(--vscode-inputValidation-errorBorder)" : "none"};
-  text-align: center;
-  &:focus {
-    outline: none;
-  }
-`;
 const BoardName = styled.h1`
   text-align: center;
-  .edit-icon {
-    vertical-align: middle;
-    margin-left: 8px;
-    visibility: hidden;
-    cursor: pointer;
-  }
-  &:hover {
-    .edit-icon {
-      visibility: visible;
-    }
-  }
-  .input-error {
-    padding: 0 30px 0 50px;
-    transition: 0.28s;
-    /* font-style: italic; */
-    font-size: 16px;
-  }
+  height: 40px;
 `;
 
 export default function Board({
@@ -56,7 +21,6 @@ export default function Board({
 }: any) {
   // Initialize board state with board data
   const [state, setState] = useState(defaultBoardConfig);
-  const [isEdit, setEdit] = useState(false);
   const [boardName, setBoardName] = useState("");
   useEffect(() => {
     // Update board when configJson changes from input
@@ -165,21 +129,20 @@ export default function Board({
 
     updateJsonConfig(newState);
   }
-  const [isNameError, setNameError] = useState(false);
+  const [nameErrMsg, setNameErrMsg] = useState("");
   useEffect(() => {
     const filteredDir: string[] = allDirectoryNames.filter(
       (x: string) => x !== state.boardName
     );
     if (filteredDir.indexOf(boardName) !== -1) {
-      setNameError(true);
+      setNameErrMsg(`Board by name "${boardName}" already exists.`);
     } else {
-      setNameError(false);
+      setNameErrMsg("");
     }
   }, [boardName, allDirectoryNames]);
 
   function updateBoardName(boardName: string) {
-    setEdit(false);
-    if (boardName && !isNameError) {
+    if (!nameErrMsg) {
       let newState = { ...state, boardName: boardName };
       vscodeApi.postMessage({
         action: ACTION.renameBoard,
@@ -188,61 +151,20 @@ export default function Board({
         data: newState,
       });
       updateState(newState);
-    } else {
-      setBoardName(state.boardName);
     }
   }
 
-  function handleKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-    callback: Function
-  ) {
-    if (event.key === "Enter") {
-      callback();
-    }
-  }
-
-  function onBoardEdit() {
-    setEdit(true);
-    setBoardName(state.boardName);
-  }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div>
         <BoardName className="board-name">
-          {isEdit ? (
-            <>
-              <BoardInput
-                isError={isNameError}
-                type="text"
-                autoFocus
-                value={boardName}
-                onChange={(e) => setBoardName(e.target.value)}
-                onKeyDown={(e) =>
-                  handleKeyDown(e, () => updateBoardName(boardName))
-                }
-                onBlur={() => {
-                  updateBoardName(boardName);
-                }}
-              />{" "}
-              {isNameError && (
-                <div className="input-error">
-                  Board by name "{boardName}" already exists.
-                </div>
-              )}
-            </>
-          ) : (
-            <span>
-              {state.boardName}
-              <span
-                className="edit-icon"
-                title="Edit Board Name"
-                onClick={onBoardEdit}
-              >
-                <AiOutlineEdit />
-              </span>
-            </span>
-          )}
+          <InputBox
+            title="Enter Board Name"
+            value={state.boardName}
+            errMsg={nameErrMsg}
+            onChange={(e: string) => setBoardName(e)}
+            applyChange={(e: string) => updateBoardName(e)}
+          ></InputBox>
         </BoardName>
         <Droppable
           droppableId="all-droppables"
