@@ -10,14 +10,21 @@ import styled from "@emotion/styled";
 import { BoardItem, Task } from "../board-item";
 import * as types from "../../core/types";
 import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import InputBox from "../input-box";
 
+const ColumnTitle = styled.h2`
+  text-align: left;
+  height: 37px;
+`;
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
   column: types.Column;
   tasks: types.Task[];
   index: number;
+  columnNames: string[];
+  applyChange: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -61,7 +68,20 @@ function getBackgroundColor(isDraggingOver: boolean) {
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
-  ({ column, index, tasks }: any) => {
+  ({ column, index, tasks, columnNames, applyChange }: BoardColumnProps) => {
+    const [nameErrMsg, setNameErrMsg] = useState("");
+    const [columnName, setColumnName] = useState("");
+
+    useEffect(() => {
+      const filteredDir: string[] = columnNames.filter(
+        (x: string) => x !== column.title
+      );
+      if (filteredDir.indexOf(columnName) !== -1) {
+        setNameErrMsg(`Column by name "${columnName}" already exists.`);
+      } else {
+        setNameErrMsg("");
+      }
+    }, [columnName, columnNames]);
     return (
       <Draggable draggableId={column.id} key={column.id} index={index}>
         {(provided) => (
@@ -70,7 +90,16 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
             ref={provided.innerRef}
           >
             <BoardColumnTitle {...provided.dragHandleProps}>
-              <h2>{column.title}</h2>
+              <ColumnTitle>
+                <InputBox
+                  title="Enter Column Name"
+                  value={column.title}
+                  errMsg={nameErrMsg}
+                  onChange={(e: string) => setColumnName(e)}
+                  applyChange={(e: string) => applyChange(e)}
+                  textAlign="left"
+                ></InputBox>
+              </ColumnTitle>
             </BoardColumnTitle>
 
             <TaskList column={column} index={index} tasks={tasks} />

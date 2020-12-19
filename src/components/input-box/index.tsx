@@ -3,8 +3,9 @@ import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 
-type BoardInputProps = {
+type InputBoxStyleProps = {
   isError: boolean;
+  textAlign: string | undefined;
 };
 export const InputBoxContainer = styled.div`
   .edit-icon {
@@ -39,7 +40,7 @@ export const InputBoxContainer = styled.div`
     }
   }
 `;
-export const AgileInput = styled.input<BoardInputProps>`
+export const AgileInput = styled.input<InputBoxStyleProps>`
   background-color: ${(props) =>
     props.isError
       ? "var(--vscode-inputValidation-errorBackground)"
@@ -51,7 +52,7 @@ export const AgileInput = styled.input<BoardInputProps>`
   font-size: 0.8em;
   border: ${(props) =>
     props.isError ? "var(--vscode-inputValidation-errorBorder)" : "none"};
-  text-align: center;
+  text-align: ${(props) => (props.textAlign ? props.textAlign : "center")};
   &:focus {
     outline: none;
   }
@@ -62,6 +63,7 @@ export type InputBoxProps = {
   value: string;
   title: string;
   errMsg?: string;
+  textAlign?: string;
   onChange: Function;
   applyChange: Function;
 };
@@ -72,6 +74,7 @@ export default function InputBox({
   errMsg,
   onChange,
   applyChange,
+  textAlign,
 }: InputBoxProps) {
   const info = "Hit Enter to Save";
   const [state, setState] = useState(value);
@@ -93,7 +96,12 @@ export default function InputBox({
     callback: Function
   ) {
     if (event.key === "Enter") {
-      callback();
+      if (!err) {
+        callback();
+      } else {
+        setState(value);
+        callback();
+      }
     }
   }
 
@@ -126,8 +134,12 @@ export default function InputBox({
             type="text"
             autoFocus
             value={state}
+            textAlign={textAlign}
             onChange={(e) => valueChange(e.target.value)}
             onKeyDown={(e) => handleEnterKeyDown(e, () => updateValue(state))}
+            onBlur={() => {
+              updateValue(state);
+            }}
           />{" "}
           {<div className="input-error">{err || info}</div>}
         </>

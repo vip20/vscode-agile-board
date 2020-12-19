@@ -150,8 +150,14 @@ export default function Board({
         to: boardName,
         data: newState,
       });
-      updateState(newState);
+      updateJsonConfig(newState);
     }
+  }
+
+  function updateColumnName(columnName: string, columnId: string) {
+    let newState = { ...state };
+    newState.columns[columnId].title = columnName;
+    updateJsonConfig(newState);
   }
 
   return (
@@ -184,9 +190,14 @@ export default function Board({
                 const tasks = column.tasksIds.map(
                   (taskId: string) => (state.tasks as any)[taskId]
                 );
+                const allColumnTitles = Object.values(state.columns as any).map(
+                  (x: any) => x.title
+                );
                 // Render the BoardColumn component
                 return (
                   <BoardColumn
+                    applyChange={(e: string) => updateColumnName(e, column.id)}
+                    columnNames={allColumnTitles}
                     key={column.id}
                     column={column}
                     tasks={tasks}
