@@ -10,6 +10,7 @@ export interface Column {
   id: string;
   title: string;
   tasksIds: string[];
+  isDefault: boolean;
 }
 
 export interface Board {
