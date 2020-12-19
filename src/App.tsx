@@ -3,6 +3,7 @@ import "./App.css";
 import Board from "./components/board";
 import { ACTION, defaultBoardConfig } from "./core/constants";
 import * as types from "./core/types";
+import { ResponsiveProvider } from "./hooks/useResponsive";
 declare const vscodeApi: any;
 export default function App() {
   const [configJson, _setConfigJson] = useState(defaultBoardConfig);
@@ -41,11 +42,13 @@ export default function App() {
 
   return (
     <>
-      <Board
-        configJson={configJson}
-        vscodeApi={vscodeApi}
-        allDirectoryNames={allDirectories}
-      ></Board>
+      <ResponsiveProvider>
+        <Board
+          configJson={configJson}
+          vscodeApi={vscodeApi}
+          allDirectoryNames={allDirectories}
+        ></Board>
+      </ResponsiveProvider>
     </>
   );
 }

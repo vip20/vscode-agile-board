@@ -12,6 +12,7 @@ import * as types from "../../core/types";
 import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import InputBox from "../input-box";
+import useResponsive from "../../hooks/useResponsive";
 
 const ColumnTitle = styled.h2`
   text-align: left;
@@ -111,6 +112,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
 );
 
 const TaskList = React.memo(({ column, index, tasks }: any) => {
+  const { height } = useResponsive();
   const listRef = useRef<any>();
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -135,10 +137,9 @@ const TaskList = React.memo(({ column, index, tasks }: any) => {
         const itemCount = snapshot.isUsingPlaceholder
           ? tasks.length + 1
           : tasks.length;
-
         return (
           <FixedSizeList
-            height={500}
+            height={height - 180}
             itemCount={itemCount}
             itemSize={110}
             width={300}
