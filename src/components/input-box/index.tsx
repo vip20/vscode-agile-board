@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
-import { AiOutlineEdit } from "react-icons/ai";
+import { VscEdit } from "react-icons/vsc";
 
 type InputBoxStyleProps = {
   isError: boolean;
