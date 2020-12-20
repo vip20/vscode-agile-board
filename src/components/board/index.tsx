@@ -5,7 +5,6 @@ import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
 import { ACTION, defaultBoardConfig } from "../../core/constants";
 import * as t from "../../core/types";
-import { AiOutlineEdit } from "react-icons/ai";
 import { reorderList } from "../../core/helpers";
 import InputBox from "../input-box";
 
@@ -165,7 +164,7 @@ export default function Board({
       <div>
         <BoardName className="board-name">
           <InputBox
-            title="Enter Board Name"
+            title="Edit Board Name"
             value={state.boardName}
             errMsg={nameErrMsg}
             onChange={(e: string) => setBoardName(e)}

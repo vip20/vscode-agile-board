@@ -50,15 +50,10 @@ const BoardColumnTitle = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 0 16px;
-  h2 {
-    flex: 0 0 80%;
-    /* padding: 2%; */
-    border: 1px solid transparent;
-    border-radius: 4px;
-    font: 20px sans-serif;
-    font-weight: 600;
-    cursor: default;
-  }
+  display: flex;
+  place-content: space-between;
+  align-items: baseline;
+  padding: 10px;
 `;
 
 function getBackgroundColor(isDraggingOver: boolean) {
@@ -93,7 +88,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
             <BoardColumnTitle {...provided.dragHandleProps}>
               <ColumnTitle>
                 <InputBox
-                  title="Enter Column Name"
+                  title="Edit Column Name"
                   value={column.title}
                   errMsg={nameErrMsg}
                   onChange={(e: string) => setColumnName(e)}

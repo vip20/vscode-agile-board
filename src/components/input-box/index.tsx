@@ -13,6 +13,7 @@ export const InputBoxContainer = styled.div`
     margin-left: 8px;
     visibility: hidden;
     cursor: pointer;
+    font-size: 0.7em !important;
   }
   &:hover {
     .edit-icon {
@@ -147,7 +148,7 @@ export default function InputBox({
         <span className="display">
           {state}
           <span className="edit-icon" title={placeHolder} onClick={onEdit}>
-            <AiOutlineEdit />
+            <VscEdit />
           </span>
         </span>
       )}
