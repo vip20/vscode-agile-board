@@ -59,6 +59,7 @@
     "yzhang.markdown-all-in-one"
   ],
   "dependencies": {
+    "classnames": "^2.2.6",
     "fs-extra": "^9.0.1",
     "moment": "^2.29.1",
     "node-sass": "^4.0.0",
@@ -85,6 +86,7 @@
   "devDependencies": {
     "@emotion/react": "^11.1.1",
     "@emotion/styled": "^11.0.0",
+    "@types/classnames": "^2.2.11",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^23.3.13",
     "@types/moment": "^2.13.0",

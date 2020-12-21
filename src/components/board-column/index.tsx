@@ -13,10 +13,21 @@ import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import InputBox from "../input-box";
 import useResponsive from "../../hooks/useResponsive";
+import { VscKebabVertical, VscChevronRight } from "react-icons/vsc";
+import DropdownMenu from "../drop-down";
+import useOutsideClick from "../../hooks/useOutsideClick";
 
 const ColumnTitle = styled.h2`
   text-align: left;
   height: 37px;
+  margin: 0;
+  flex: 0 0 80%;
+  /* padding: 2%; */
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 20px sans-serif;
+  font-weight: 600;
+  cursor: default;
 `;
 // Define types for board column element properties
 type BoardColumnProps = {
@@ -67,7 +78,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
   ({ column, index, tasks, columnNames, applyChange }: BoardColumnProps) => {
     const [nameErrMsg, setNameErrMsg] = useState("");
     const [columnName, setColumnName] = useState("");
-
+    const [menuOpen, setMenuOpen] = useState(false);
     useEffect(() => {
       const filteredDir: string[] = columnNames.filter(
         (x: string) => x !== column.title
@@ -80,27 +91,70 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
     }, [columnName, columnNames]);
     return (
       <Draggable draggableId={column.id} key={column.id} index={index}>
-        {(provided) => (
-          <BoardColumnWrapper
-            {...provided.draggableProps}
-            ref={provided.innerRef}
-          >
-            <BoardColumnTitle {...provided.dragHandleProps}>
-              <ColumnTitle>
-                <InputBox
-                  title="Edit Column Name"
-                  value={column.title}
-                  errMsg={nameErrMsg}
-                  onChange={(e: string) => setColumnName(e)}
-                  applyChange={(e: string) => applyChange(e)}
-                  textAlign="left"
-                ></InputBox>
-              </ColumnTitle>
-            </BoardColumnTitle>
+        {(provided) => {
+          const dropdownMenu: types.DropdownMenu = {
+            primary: {
+              main: [
+                {
+                  children: "Add Column",
+                  goToMenu: "addColumn",
+                  rightIcon: <VscChevronRight />,
+                },
+                {
+                  children: "Delete Column",
+                  callbackFn: () => alert("a"),
+                  isDisabled: column.isDefault || column.tasksIds.length > 0,
+                },
+              ],
+            },
+            secondary: {
+              addColumn: [
+                {
+                  children: "Add Column to Left",
+                  callbackFn: () => alert("left"),
+                },
+                {
+                  children: "Add Column to Right",
+                  callbackFn: () => alert("left"),
+                },
+              ],
+            },
+          };
+          return (
+            <BoardColumnWrapper
+              {...provided.draggableProps}
+              ref={provided.innerRef}
+            >
+              <BoardColumnTitle {...provided.dragHandleProps}>
+                <ColumnTitle>
+                  <InputBox
+                    title="Edit Column Name"
+                    value={column.title}
+                    errMsg={nameErrMsg}
+                    onChange={(e: string) => setColumnName(e)}
+                    applyChange={(e: string) => applyChange(e)}
+                    textAlign="left"
+                  ></InputBox>
+                </ColumnTitle>
+                <div>
+                  <span
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <VscKebabVertical></VscKebabVertical>
+                  </span>
+                  {menuOpen && (
+                    <div>
+                      <DropdownMenu {...dropdownMenu} />
+                    </div>
+                  )}
+                </div>
+              </BoardColumnTitle>
 
-            <TaskList column={column} index={index} tasks={tasks} />
-          </BoardColumnWrapper>
-        )}
+              <TaskList column={column} index={index} tasks={tasks} />
+            </BoardColumnWrapper>
+          );
+        }}
       </Draggable>
     );
   }

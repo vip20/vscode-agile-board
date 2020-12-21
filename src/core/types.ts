@@ -27,3 +27,16 @@ export interface QuickPickParameters<T extends QuickPickItem> {
   placeholder: string;
   defaultItems?: T[];
 }
+
+export interface DropdownItem {
+  leftIcon?: JSX.Element | string;
+  rightIcon?: JSX.Element | string;
+  goToMenu?: string;
+  callbackFn?: Function;
+  isDisabled?: boolean;
+  children: JSX.Element | string;
+}
+export interface DropdownMenu {
+  primary: { main: DropdownItem[] };
+  secondary?: { [key: string]: DropdownItem[] };
+}
