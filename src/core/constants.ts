@@ -84,3 +84,8 @@ export const ACTION = {
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";
+
+export enum COLUMN_ADD {
+  before,
+  after,
+}

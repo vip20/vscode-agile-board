@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
-import { ACTION, defaultBoardConfig } from "../../core/constants";
+import { ACTION, COLUMN_ADD, defaultBoardConfig } from "../../core/constants";
 import * as t from "../../core/types";
-import { reorderList } from "../../core/helpers";
+import { reorderList, uidGenerator } from "../../core/helpers";
 import InputBox from "../input-box";
 
 const BoardName = styled.h1`
@@ -154,8 +154,29 @@ export default function Board({
   }
 
   function updateColumnName(columnName: string, columnId: string) {
-    let newState = { ...state };
+    const newState = { ...state };
     newState.columns[columnId].title = columnName;
+    updateJsonConfig(newState);
+  }
+
+  function addColumn(type: COLUMN_ADD, index: number) {
+    const newState = { ...state };
+    const uid = uidGenerator();
+    const atIndex = type === COLUMN_ADD.after ? index + 1 : index;
+    const newColumn: t.Column = {
+      id: `_${uid}`,
+      isDefault: false,
+      tasksIds: [],
+      title: uid,
+    };
+    newState.columns[newColumn.id] = newColumn;
+    newState.columnsOrder.splice(atIndex, 0, newColumn.id);
+    updateJsonConfig(newState);
+  }
+  function deleteColumn(columnId: string, index: number) {
+    const newState = { ...state };
+    delete newState.columns[columnId];
+    newState.columnsOrder.splice(index, 1);
     updateJsonConfig(newState);
   }
 
@@ -201,6 +222,12 @@ export default function Board({
                     column={column}
                     tasks={tasks}
                     index={index}
+                    addColumn={(type: COLUMN_ADD, index: number) =>
+                      addColumn(type, index)
+                    }
+                    deleteColumn={(id: string, index: number) =>
+                      deleteColumn(id, index)
+                    }
                   />
                 );
               })}

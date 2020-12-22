@@ -22,6 +22,7 @@ import {
   BiAddToQueue,
   BiTrash,
 } from "react-icons/bi";
+import { COLUMN_ADD } from "../../core/constants";
 
 const ColumnTitle = styled.h2`
   text-align: left;
@@ -43,6 +44,8 @@ type BoardColumnProps = {
   index: number;
   columnNames: string[];
   applyChange: Function;
+  addColumn: Function;
+  deleteColumn: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -81,7 +84,15 @@ function getBackgroundColor(isDraggingOver: boolean) {
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
-  ({ column, index, tasks, columnNames, applyChange }: BoardColumnProps) => {
+  ({
+    column,
+    index,
+    tasks,
+    columnNames,
+    applyChange,
+    addColumn,
+    deleteColumn,
+  }: BoardColumnProps) => {
     const [nameErrMsg, setNameErrMsg] = useState("");
     const [columnName, setColumnName] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -115,7 +126,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 },
                 {
                   children: "Delete Column",
-                  callbackFn: () => alert("a"),
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    deleteColumn(column.id, index);
+                  },
                   isDisabled: column.isDefault || column.tasksIds.length > 0,
                   leftIcon: <BiTrash />,
                 },
@@ -125,12 +139,18 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
               addColumn: [
                 {
                   children: "Before This",
-                  callbackFn: () => alert("left"),
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    addColumn(COLUMN_ADD.before, index);
+                  },
                   leftIcon: <BiArrowToLeft />,
                 },
                 {
                   children: "After This",
-                  callbackFn: () => alert("left"),
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    addColumn(COLUMN_ADD.after, index);
+                  },
                   leftIcon: <BiArrowToRight />,
                 },
               ],
