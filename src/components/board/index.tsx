@@ -3,50 +3,14 @@ import { useEffect, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { BoardColumn } from "../board-column";
-import { ACTION, defaultBoardConfig } from "../../core/constants";
+import { ACTION, COLUMN_ADD, defaultBoardConfig } from "../../core/constants";
 import * as t from "../../core/types";
-import { AiOutlineEdit } from "react-icons/ai";
-import { reorderList } from "../../core/helpers";
+import { reorderList, uidGenerator } from "../../core/helpers";
+import InputBox from "../input-box";
 
-type BoardInputProps = {
-  isError: boolean;
-};
-const BoardInput = styled.input<BoardInputProps>`
-  background-color: ${(props) =>
-    props.isError
-      ? "var(--vscode-inputValidation-errorBackground)"
-      : "var(--vscode-input-background)"};
-  color: ${(props) =>
-    props.isError
-      ? "var(--vscode-inputValidation-errorForeground)"
-      : "var(--vscode-input-foreground)"};
-  font-size: 0.8em;
-  border: ${(props) =>
-    props.isError ? "var(--vscode-inputValidation-errorBorder)" : "none"};
-  text-align: center;
-  &:focus {
-    outline: none;
-  }
-`;
 const BoardName = styled.h1`
   text-align: center;
-  .edit-icon {
-    vertical-align: middle;
-    margin-left: 8px;
-    visibility: hidden;
-    cursor: pointer;
-  }
-  &:hover {
-    .edit-icon {
-      visibility: visible;
-    }
-  }
-  .input-error {
-    padding: 0 30px 0 50px;
-    transition: 0.28s;
-    /* font-style: italic; */
-    font-size: 16px;
-  }
+  height: 40px;
 `;
 
 export default function Board({
@@ -56,7 +20,6 @@ export default function Board({
 }: any) {
   // Initialize board state with board data
   const [state, setState] = useState(defaultBoardConfig);
-  const [isEdit, setEdit] = useState(false);
   const [boardName, setBoardName] = useState("");
   useEffect(() => {
     // Update board when configJson changes from input
@@ -165,21 +128,20 @@ export default function Board({
 
     updateJsonConfig(newState);
   }
-  const [isNameError, setNameError] = useState(false);
+  const [nameErrMsg, setNameErrMsg] = useState("");
   useEffect(() => {
     const filteredDir: string[] = allDirectoryNames.filter(
       (x: string) => x !== state.boardName
     );
     if (filteredDir.indexOf(boardName) !== -1) {
-      setNameError(true);
+      setNameErrMsg(`Board by name "${boardName}" already exists.`);
     } else {
-      setNameError(false);
+      setNameErrMsg("");
     }
   }, [boardName, allDirectoryNames]);
 
   function updateBoardName(boardName: string) {
-    setEdit(false);
-    if (boardName && !isNameError) {
+    if (!nameErrMsg) {
       let newState = { ...state, boardName: boardName };
       vscodeApi.postMessage({
         action: ACTION.renameBoard,
@@ -187,62 +149,48 @@ export default function Board({
         to: boardName,
         data: newState,
       });
-      updateState(newState);
-    } else {
-      setBoardName(state.boardName);
+      updateJsonConfig(newState);
     }
   }
 
-  function handleKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-    callback: Function
-  ) {
-    if (event.key === "Enter") {
-      callback();
-    }
+  function updateColumnName(columnName: string, columnId: string) {
+    const newState = { ...state };
+    newState.columns[columnId].title = columnName;
+    updateJsonConfig(newState);
   }
 
-  function onBoardEdit() {
-    setEdit(true);
-    setBoardName(state.boardName);
+  function addColumn(type: COLUMN_ADD, index: number) {
+    const newState = { ...state };
+    const uid = uidGenerator();
+    const atIndex = type === COLUMN_ADD.after ? index + 1 : index;
+    const newColumn: t.Column = {
+      id: `_${uid}`,
+      isDefault: false,
+      tasksIds: [],
+      title: uid,
+    };
+    newState.columns[newColumn.id] = newColumn;
+    newState.columnsOrder.splice(atIndex, 0, newColumn.id);
+    updateJsonConfig(newState);
   }
+  function deleteColumn(columnId: string, index: number) {
+    const newState = { ...state };
+    delete newState.columns[columnId];
+    newState.columnsOrder.splice(index, 1);
+    updateJsonConfig(newState);
+  }
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div>
         <BoardName className="board-name">
-          {isEdit ? (
-            <>
-              <BoardInput
-                isError={isNameError}
-                type="text"
-                autoFocus
-                value={boardName}
-                onChange={(e) => setBoardName(e.target.value)}
-                onKeyDown={(e) =>
-                  handleKeyDown(e, () => updateBoardName(boardName))
-                }
-                onBlur={() => {
-                  updateBoardName(boardName);
-                }}
-              />{" "}
-              {isNameError && (
-                <div className="input-error">
-                  Board by name "{boardName}" already exists.
-                </div>
-              )}
-            </>
-          ) : (
-            <span>
-              {state.boardName}
-              <span
-                className="edit-icon"
-                title="Edit Board Name"
-                onClick={onBoardEdit}
-              >
-                <AiOutlineEdit />
-              </span>
-            </span>
-          )}
+          <InputBox
+            title="Edit Board Name"
+            value={state.boardName}
+            errMsg={nameErrMsg}
+            onChange={(e: string) => setBoardName(e)}
+            applyChange={(e: string) => updateBoardName(e)}
+          ></InputBox>
         </BoardName>
         <Droppable
           droppableId="all-droppables"
@@ -262,13 +210,24 @@ export default function Board({
                 const tasks = column.tasksIds.map(
                   (taskId: string) => (state.tasks as any)[taskId]
                 );
+                const allColumnTitles = Object.values(state.columns as any).map(
+                  (x: any) => x.title
+                );
                 // Render the BoardColumn component
                 return (
                   <BoardColumn
+                    applyChange={(e: string) => updateColumnName(e, column.id)}
+                    columnNames={allColumnTitles}
                     key={column.id}
                     column={column}
                     tasks={tasks}
                     index={index}
+                    addColumn={(type: COLUMN_ADD, index: number) =>
+                      addColumn(type, index)
+                    }
+                    deleteColumn={(id: string, index: number) =>
+                      deleteColumn(id, index)
+                    }
                   />
                 );
               })}

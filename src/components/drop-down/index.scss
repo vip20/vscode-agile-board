@@ -1,0 +1,88 @@
+/* Dropdown Menu */
+:root {
+  --bg: var(--vscode-editor-background);
+  --bg-accent: var(--vscode-tab-inactiveBackground);
+  --text-color: var(--vscode-editor-foreground);
+  --border: 1px solid var(--vscode-tab-inactiveBackground);
+  --border-radius: 5px;
+  --speed: 300ms;
+}
+
+.dropdown {
+  position: absolute;
+  z-index: 1001;
+  height: auto;
+  width: 200px;
+  transform: translateX(-45%);
+  background-color: var(--bg);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  padding: 0;
+  overflow: hidden;
+  transition: height var(--speed) ease;
+}
+
+.menu {
+  width: 100%;
+}
+
+.menu-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  transition: background var(--speed);
+  padding: 0.3rem;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1em;
+  &:hover {
+    background-color: var(--bg-accent);
+    color: inherit;
+  }
+  &.disabled {
+    color: var(--bg-accent);
+    cursor: not-allowed;
+    background-color: transparent;
+  }
+}
+
+.menu-item .icon-button {
+  margin-right: 0.5rem;
+}
+
+.menu-item .icon-button:hover {
+  filter: none;
+}
+
+.menu-item .icon-right {
+  margin-left: auto;
+}
+
+/* CSSTransition classes  */
+.menu-primary-enter {
+  position: absolute;
+  transform: translateX(-110%);
+}
+.menu-primary-enter-active {
+  transform: translateX(0%);
+  transition: all var(--speed) ease;
+}
+.menu-primary-exit {
+  position: absolute;
+}
+.menu-primary-exit-active {
+  transform: translateX(-110%);
+  transition: all var(--speed) ease;
+}
+
+.menu-secondary-enter {
+  transform: translateX(110%);
+}
+.menu-secondary-enter-active {
+  transform: translateX(0%);
+  transition: all var(--speed) ease;
+}
+.menu-secondary-exit-active {
+  transform: translateX(110%);
+  transition: all var(--speed) ease;
+}

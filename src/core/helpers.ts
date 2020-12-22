@@ -9,3 +9,7 @@ export function reorderList(
 
   return result;
 }
+
+export function uidGenerator() {
+  return Math.random().toString(36).substr(2, 9);
+}

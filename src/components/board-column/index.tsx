@@ -10,14 +10,42 @@ import styled from "@emotion/styled";
 import { BoardItem, Task } from "../board-item";
 import * as types from "../../core/types";
 import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import InputBox from "../input-box";
+import useResponsive from "../../hooks/useResponsive";
+import { VscKebabVertical, VscChevronRight } from "react-icons/vsc";
+import DropdownMenu from "../drop-down";
+import useOutsideClick from "../../hooks/useOutsideClick";
+import {
+  BiArrowToLeft,
+  BiArrowToRight,
+  BiAddToQueue,
+  BiTrash,
+} from "react-icons/bi";
+import { COLUMN_ADD } from "../../core/constants";
 
+const ColumnTitle = styled.h2`
+  text-align: left;
+  height: 37px;
+  margin: 0;
+  flex: 0 0 80%;
+  /* padding: 2%; */
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 20px sans-serif;
+  font-weight: 600;
+  cursor: default;
+`;
 // Define types for board column element properties
 type BoardColumnProps = {
   key: string;
   column: types.Column;
   tasks: types.Task[];
   index: number;
+  columnNames: string[];
+  applyChange: Function;
+  addColumn: Function;
+  deleteColumn: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -42,15 +70,10 @@ const BoardColumnTitle = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 0 16px;
-  h2 {
-    flex: 0 0 80%;
-    /* padding: 2%; */
-    border: 1px solid transparent;
-    border-radius: 4px;
-    font: 20px sans-serif;
-    font-weight: 600;
-    cursor: default;
-  }
+  display: flex;
+  place-content: space-between;
+  align-items: baseline;
+  padding: 10px;
 `;
 
 function getBackgroundColor(isDraggingOver: boolean) {
@@ -61,27 +84,120 @@ function getBackgroundColor(isDraggingOver: boolean) {
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
-  ({ column, index, tasks }: any) => {
+  ({
+    column,
+    index,
+    tasks,
+    columnNames,
+    applyChange,
+    addColumn,
+    deleteColumn,
+  }: BoardColumnProps) => {
+    const [nameErrMsg, setNameErrMsg] = useState("");
+    const [columnName, setColumnName] = useState("");
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const menuRef = useRef<any>();
+
+    useOutsideClick(menuRef, () => {
+      setMenuOpen(false);
+    });
+    useEffect(() => {
+      const filteredDir: string[] = columnNames.filter(
+        (x: string) => x !== column.title
+      );
+      if (filteredDir.indexOf(columnName) !== -1) {
+        setNameErrMsg(`Column by name "${columnName}" already exists.`);
+      } else {
+        setNameErrMsg("");
+      }
+    }, [columnName, columnNames]);
     return (
       <Draggable draggableId={column.id} key={column.id} index={index}>
-        {(provided) => (
-          <BoardColumnWrapper
-            {...provided.draggableProps}
-            ref={provided.innerRef}
-          >
-            <BoardColumnTitle {...provided.dragHandleProps}>
-              <h2>{column.title}</h2>
-            </BoardColumnTitle>
+        {(provided) => {
+          const dropdownMenu: types.DropdownMenu = {
+            primary: {
+              main: [
+                {
+                  children: "Add Column",
+                  goToMenu: "addColumn",
+                  rightIcon: <VscChevronRight />,
+                  leftIcon: <BiAddToQueue />,
+                },
+                {
+                  children: "Delete Column",
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    deleteColumn(column.id, index);
+                  },
+                  isDisabled: column.isDefault || column.tasksIds.length > 0,
+                  leftIcon: <BiTrash />,
+                },
+              ],
+            },
+            secondary: {
+              addColumn: [
+                {
+                  children: "Before This",
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    addColumn(COLUMN_ADD.before, index);
+                  },
+                  leftIcon: <BiArrowToLeft />,
+                },
+                {
+                  children: "After This",
+                  callbackFn: () => {
+                    setMenuOpen(false);
+                    addColumn(COLUMN_ADD.after, index);
+                  },
+                  leftIcon: <BiArrowToRight />,
+                },
+              ],
+            },
+          };
+          return (
+            <BoardColumnWrapper
+              {...provided.draggableProps}
+              ref={provided.innerRef}
+            >
+              <BoardColumnTitle {...provided.dragHandleProps}>
+                <ColumnTitle>
+                  <InputBox
+                    title="Edit Column Name"
+                    value={column.title}
+                    errMsg={nameErrMsg}
+                    onChange={(e: string) => setColumnName(e)}
+                    applyChange={(e: string) => applyChange(e)}
+                    textAlign="left"
+                  ></InputBox>
+                </ColumnTitle>
+                <div ref={menuRef}>
+                  <span
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <VscKebabVertical></VscKebabVertical>
+                  </span>
+                  {menuOpen && (
+                    <div>
+                      <DropdownMenu {...dropdownMenu} />
+                    </div>
+                  )}
+                </div>
+              </BoardColumnTitle>
 
-            <TaskList column={column} index={index} tasks={tasks} />
-          </BoardColumnWrapper>
-        )}
+              <TaskList column={column} index={index} tasks={tasks} />
+            </BoardColumnWrapper>
+          );
+        }}
       </Draggable>
     );
   }
 );
 
 const TaskList = React.memo(({ column, index, tasks }: any) => {
+  const { height } = useResponsive();
   const listRef = useRef<any>();
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -106,10 +222,9 @@ const TaskList = React.memo(({ column, index, tasks }: any) => {
         const itemCount = snapshot.isUsingPlaceholder
           ? tasks.length + 1
           : tasks.length;
-
         return (
           <FixedSizeList
-            height={500}
+            height={height - 180}
             itemCount={itemCount}
             itemSize={110}
             width={300}

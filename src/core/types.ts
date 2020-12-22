@@ -10,6 +10,7 @@ export interface Column {
   id: string;
   title: string;
   tasksIds: string[];
+  isDefault: boolean;
 }
 
 export interface Board {
@@ -25,4 +26,17 @@ export interface QuickPickParameters<T extends QuickPickItem> {
   activeItem?: T;
   placeholder: string;
   defaultItems?: T[];
+}
+
+export interface DropdownItem {
+  leftIcon?: JSX.Element | string;
+  rightIcon?: JSX.Element | string;
+  goToMenu?: string;
+  callbackFn?: Function;
+  isDisabled?: boolean;
+  children: JSX.Element | string;
+}
+export interface DropdownMenu {
+  primary: { main: DropdownItem[] };
+  secondary?: { [key: string]: DropdownItem[] };
 }
