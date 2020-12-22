@@ -23,6 +23,7 @@ import {
   BiTrash,
 } from "react-icons/bi";
 import { COLUMN_ADD } from "../../core/constants";
+import { AST_PropAccess } from "terser";
 
 const AddTask = styled.div`
   text-align: center;
@@ -57,15 +58,16 @@ const ColumnTitle = styled.h2`
   cursor: default;
 `;
 // Define types for board column element properties
-type BoardColumnProps = {
+export type BoardColumnProps = {
   key: string;
   column: types.Column;
   tasks: types.Task[];
-  index: number;
+  columnIndex: number;
   columnNames: string[];
-  applyChange: Function;
+  editColumn: Function;
   addColumn: Function;
   deleteColumn: Function;
+  editTask: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -105,15 +107,7 @@ function getBackgroundColor(isDraggingOver: boolean) {
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
-  ({
-    column,
-    index,
-    tasks,
-    columnNames,
-    applyChange,
-    addColumn,
-    deleteColumn,
-  }: BoardColumnProps) => {
+  (props: BoardColumnProps) => {
     const [nameErrMsg, setNameErrMsg] = useState("");
     const [columnName, setColumnName] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -124,17 +118,21 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
       setMenuOpen(false);
     });
     useEffect(() => {
-      const filteredDir: string[] = columnNames.filter(
-        (x: string) => x !== column.title
+      const filteredDir: string[] = props.columnNames.filter(
+        (x: string) => x !== props.column.title
       );
       if (filteredDir.indexOf(columnName) !== -1) {
         setNameErrMsg(`Column by name "${columnName}" already exists.`);
       } else {
         setNameErrMsg("");
       }
-    }, [columnName, columnNames]);
+    }, [columnName, props.columnNames]);
     return (
-      <Draggable draggableId={column.id} key={column.id} index={index}>
+      <Draggable
+        draggableId={props.column.id}
+        key={props.column.id}
+        index={props.columnIndex}
+      >
         {(provided) => {
           const dropdownMenu: types.DropdownMenu = {
             primary: {
@@ -149,9 +147,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "Delete Column",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    deleteColumn(column.id, index);
+                    props.deleteColumn(props.column.id, props.columnIndex);
                   },
-                  isDisabled: column.isDefault || column.tasksIds.length > 0,
+                  isDisabled:
+                    props.column.isDefault || props.column.tasksIds.length > 0,
                   leftIcon: <BiTrash />,
                 },
               ],
@@ -162,7 +161,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "Before This",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    addColumn(COLUMN_ADD.before, index);
+                    props.addColumn(COLUMN_ADD.before, props.columnIndex);
                   },
                   leftIcon: <BiArrowToLeft />,
                 },
@@ -170,7 +169,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "After This",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    addColumn(COLUMN_ADD.after, index);
+                    props.addColumn(COLUMN_ADD.after, props.columnIndex);
                   },
                   leftIcon: <BiArrowToRight />,
                 },
@@ -186,10 +185,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 <ColumnTitle>
                   <InputBox
                     title="Edit Column Name"
-                    value={column.title}
+                    value={props.column.title}
                     errMsg={nameErrMsg}
                     onChange={(e: string) => setColumnName(e)}
-                    applyChange={(e: string) => applyChange(e)}
+                    applyChange={(e: string) => props.editColumn(e)}
                     textAlign="left"
                   ></InputBox>
                 </ColumnTitle>
@@ -208,7 +207,12 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 </div>
               </BoardColumnTitle>
 
-              <TaskList column={column} index={index} tasks={tasks} />
+              <TaskList
+                column={props.column}
+                index={props.columnIndex}
+                tasks={props.tasks}
+                editTask={props.editTask}
+              />
 
               <AddTask>
                 <VscAdd />
@@ -221,7 +225,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
   }
 );
 
-const TaskList = React.memo(({ column, index, tasks }: any) => {
+const TaskList = React.memo(({ column, index, tasks, editTask }: any) => {
   const { height } = useResponsive();
   const listRef = useRef<any>();
   useLayoutEffect(() => {
@@ -230,7 +234,10 @@ const TaskList = React.memo(({ column, index, tasks }: any) => {
       list.scrollTo(0);
     }
   }, [index]);
-
+  let taskData = {
+    tasks: tasks,
+    editTask: (id: string, task: types.Task) => editTask(id, task),
+  };
   return (
     <Droppable
       droppableId={column.id}
@@ -254,7 +261,7 @@ const TaskList = React.memo(({ column, index, tasks }: any) => {
             itemSize={110}
             width={300}
             outerRef={provided.innerRef}
-            itemData={tasks}
+            itemData={taskData}
             ref={listRef}
             style={{
               backgroundColor: getBackgroundColor(snapshot.isDraggingOver),

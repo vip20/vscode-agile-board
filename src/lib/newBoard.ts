@@ -81,6 +81,9 @@ function createBoard(
       boardName: value,
       createdDate: moment().toISOString(),
     };
+    ["backlog", "inProgress", "done", "closed"].forEach((x) => {
+      config.columns[x].createdDate = moment().toISOString();
+    });
     fs.writeJsonSync(boardConfigFile, config);
   }
   ReactPanel.createOrShow(extensionPath);
