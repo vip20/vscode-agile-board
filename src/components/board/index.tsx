@@ -188,6 +188,19 @@ export default function Board({
     newState.columnsOrder.splice(index, 1);
     updateJsonConfig(newState);
   }
+  function addTask(columnId: string) {
+    const newState = { ...state };
+    const uid = `_${uidGenerator()}`;
+    const newTask: t.Task = {
+      id: uid,
+      title: `Task${uid}`,
+      description: `Edit Description`,
+      createdDate: moment().toISOString(),
+    };
+    newState.tasks[newTask.id] = newTask;
+    newState.columns[columnId].tasksIds.push(newTask.id);
+    updateJsonConfig(newState);
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -234,6 +247,7 @@ export default function Board({
                     deleteColumn(id, index),
                   tasks: tasks,
                   editTask: (id: string, task: t.Task) => updateTask(id, task),
+                  addTask: (columnId: string) => addTask(columnId),
                 };
                 // Render the BoardColumn component
                 return <BoardColumn {...data} />;

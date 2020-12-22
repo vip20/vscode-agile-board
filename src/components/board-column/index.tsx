@@ -68,6 +68,7 @@ export type BoardColumnProps = {
   addColumn: Function;
   deleteColumn: Function;
   editTask: Function;
+  addTask: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -214,7 +215,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 editTask={props.editTask}
               />
 
-              <AddTask>
+              <AddTask onClick={() => props.addTask(props.column.id)}>
                 <VscAdd />
               </AddTask>
             </BoardColumnWrapper>
