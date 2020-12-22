@@ -161,13 +161,13 @@ export default function Board({
 
   function addColumn(type: COLUMN_ADD, index: number) {
     const newState = { ...state };
-    const uid = uidGenerator();
+    const uid = `_${uidGenerator()}`;
     const atIndex = type === COLUMN_ADD.after ? index + 1 : index;
     const newColumn: t.Column = {
-      id: `_${uid}`,
+      id: uid,
       isDefault: false,
       tasksIds: [],
-      title: uid,
+      title: `Col${uid}`,
     };
     newState.columns[newColumn.id] = newColumn;
     newState.columnsOrder.splice(atIndex, 0, newColumn.id);

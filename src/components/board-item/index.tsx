@@ -29,7 +29,7 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
 
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
-    border-color: var(--vscode-editor-foreground);
+    border-color: var(--vscode-tab-inactiveBackground);
   }
 
   /* & + & {

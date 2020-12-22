@@ -13,7 +13,7 @@ import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import InputBox from "../input-box";
 import useResponsive from "../../hooks/useResponsive";
-import { VscKebabVertical, VscChevronRight } from "react-icons/vsc";
+import { VscKebabVertical, VscChevronRight, VscAdd } from "react-icons/vsc";
 import DropdownMenu from "../drop-down";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import {
@@ -24,10 +24,30 @@ import {
 } from "react-icons/bi";
 import { COLUMN_ADD } from "../../core/constants";
 
+const AddTask = styled.div`
+  text-align: center;
+  width: 96%;
+  margin: 0 2%;
+  height: 15px;
+  font-size: 16px;
+  vertical-align: middle;
+  position: relative;
+  bottom: 0px;
+  padding: 10px 0;
+  background-color: var(--vscode-tab-inactiveBackground);
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  &:hover {
+    background-color: var(--vscode-editorGroupHeader-tabsBackground);
+    border-color: var(--vscode-tab-inactiveBackground);
+  }
+`;
 const ColumnTitle = styled.h2`
   text-align: left;
   height: 37px;
   margin: 0;
+  max-width: 80%;
   flex: 0 0 80%;
   /* padding: 2%; */
   border: 1px solid transparent;
@@ -57,6 +77,7 @@ const BoardColumnWrapper = styled.div`
   /* background: none; */
   border-radius: 4px;
   min-width: 300px;
+  max-width: 300px;
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -188,6 +209,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
               </BoardColumnTitle>
 
               <TaskList column={column} index={index} tasks={tasks} />
+
+              <AddTask>
+                <VscAdd />
+              </AddTask>
             </BoardColumnWrapper>
           );
         }}
@@ -224,7 +249,7 @@ const TaskList = React.memo(({ column, index, tasks }: any) => {
           : tasks.length;
         return (
           <FixedSizeList
-            height={height - 180}
+            height={height - 200}
             itemCount={itemCount}
             itemSize={110}
             width={300}
