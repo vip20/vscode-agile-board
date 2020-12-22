@@ -37,6 +37,7 @@
   font-size: 1em;
   &:hover {
     background-color: var(--bg-accent);
+    color: inherit;
   }
   &.disabled {
     color: var(--bg-accent);

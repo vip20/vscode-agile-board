@@ -16,6 +16,12 @@ import useResponsive from "../../hooks/useResponsive";
 import { VscKebabVertical, VscChevronRight } from "react-icons/vsc";
 import DropdownMenu from "../drop-down";
 import useOutsideClick from "../../hooks/useOutsideClick";
+import {
+  BiArrowToLeft,
+  BiArrowToRight,
+  BiAddToQueue,
+  BiTrash,
+} from "react-icons/bi";
 
 const ColumnTitle = styled.h2`
   text-align: left;
@@ -79,6 +85,12 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
     const [nameErrMsg, setNameErrMsg] = useState("");
     const [columnName, setColumnName] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
+
+    const menuRef = useRef<any>();
+
+    useOutsideClick(menuRef, () => {
+      setMenuOpen(false);
+    });
     useEffect(() => {
       const filteredDir: string[] = columnNames.filter(
         (x: string) => x !== column.title
@@ -99,23 +111,27 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "Add Column",
                   goToMenu: "addColumn",
                   rightIcon: <VscChevronRight />,
+                  leftIcon: <BiAddToQueue />,
                 },
                 {
                   children: "Delete Column",
                   callbackFn: () => alert("a"),
                   isDisabled: column.isDefault || column.tasksIds.length > 0,
+                  leftIcon: <BiTrash />,
                 },
               ],
             },
             secondary: {
               addColumn: [
                 {
-                  children: "Add Column to Left",
+                  children: "Before This",
                   callbackFn: () => alert("left"),
+                  leftIcon: <BiArrowToLeft />,
                 },
                 {
-                  children: "Add Column to Right",
+                  children: "After This",
                   callbackFn: () => alert("left"),
+                  leftIcon: <BiArrowToRight />,
                 },
               ],
             },
@@ -136,7 +152,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                     textAlign="left"
                   ></InputBox>
                 </ColumnTitle>
-                <div>
+                <div ref={menuRef}>
                   <span
                     onClick={() => setMenuOpen(!menuOpen)}
                     style={{ cursor: "pointer" }}

@@ -11,6 +11,8 @@ import {
 import * as t from "../../core/types";
 import classNames from "classnames";
 
+const startCase = require("lodash.startcase");
+
 export default function DropdownMenu(menu: t.DropdownMenu) {
   const [activeMenu, setActiveMenu] = useState("main");
   const [menuHeight, setMenuHeight] = useState<number>(0);
@@ -88,7 +90,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
             >
               <div className="menu">
                 <DropdownItem goToMenu="main" leftIcon={<VscArrowLeft />}>
-                  <h3>Go Back</h3>
+                  <h3>{startCase(k)}</h3>
                 </DropdownItem>
                 {currentSecMenu.map((item) => (
                   <DropdownItem {...item} />

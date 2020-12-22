@@ -4,7 +4,7 @@
   "engines": {
     "vscode": "^1.23.0"
   },
-  "publisher": "sqrdup",
+  "publisher": "vip20",
   "repository": {
     "type": "git",
     "url": "https://github.com/sqrdcodemons/vscode-agile-board"
@@ -61,6 +61,7 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "fs-extra": "^9.0.1",
+    "lodash.startcase": "^4.4.0",
     "moment": "^2.29.1",
     "node-sass": "^4.0.0",
     "react": "^16.14.0",
@@ -89,6 +90,7 @@
     "@types/classnames": "^2.2.11",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^23.3.13",
+    "@types/lodash.startcase": "^4.4.6",
     "@types/moment": "^2.13.0",
     "@types/node": "^10.1.2",
     "@types/react": "^16.14.2",
