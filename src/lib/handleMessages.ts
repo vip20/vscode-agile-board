@@ -53,6 +53,10 @@ export default function handleMessages(
             }
             let boardPath = path.join(boardFolder, boardName);
             updateConfigJson(boardPath, data);
+            ReactPanel.panel.webview.postMessage({
+              action: ACTION.fetchJson,
+              data: data,
+            });
           });
           break;
         case ACTION.openTaskFile:
