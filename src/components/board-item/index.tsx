@@ -4,12 +4,13 @@ import styled from "@emotion/styled";
 import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
+import { BsBoxArrowRight } from "react-icons/bs";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
   index: number;
   style: any;
-  data: { tasks: t.Task[]; editTask: Function };
+  data: { tasks: t.Task[]; editTask: Function; openTaskFile: Function };
 };
 
 // Define types for board item element style properties
@@ -22,6 +23,18 @@ export const TaskCard = styled.div`
   margin: 4px;
   height: 100%;
   width: 100%;
+`;
+
+export const TaskTitle = styled.h4`
+  flex: 0 0 80%;
+  margin: 0px;
+`;
+
+export const TitleRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  place-content: space-between;
+  padding: 8px;
 `;
 // Create style for board item element
 export const BoardItemEl = styled.div<BoardItemStylesProps>`
@@ -88,15 +101,23 @@ export function Task({ provided, task, style, isDragging, data }: any) {
       })}
     >
       <TaskCard>
-        <h4>
-          <InputBox
-            title="Edit Task Title"
-            value={task.title}
-            onChange={(e: string) => {}}
-            applyChange={(e: string) => editTaskByKey(e, "title")}
-            textAlign="left"
-          ></InputBox>
-        </h4>
+        <TitleRow>
+          <TaskTitle>
+            <InputBox
+              title="Edit Task Title"
+              value={task.title}
+              onChange={(e: string) => {}}
+              applyChange={(e: string) => editTaskByKey(e, "title")}
+              textAlign="left"
+            ></InputBox>
+          </TaskTitle>
+          <div
+            onClick={() => data.openTaskFile(task.files[0])}
+            className="cursor-pointer"
+          >
+            <BsBoxArrowRight />
+          </div>
+        </TitleRow>
       </TaskCard>
     </BoardItemEl>
   );

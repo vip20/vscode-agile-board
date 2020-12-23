@@ -24,6 +24,7 @@ import {
 } from "react-icons/bi";
 import { COLUMN_ADD } from "../../core/constants";
 import { AST_PropAccess } from "terser";
+import { findDOMNode } from "react-dom";
 
 const AddTask = styled.div`
   text-align: center;
@@ -69,6 +70,7 @@ export type BoardColumnProps = {
   deleteColumn: Function;
   editTask: Function;
   addTask: Function;
+  openTaskFile: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -86,6 +88,10 @@ const BoardColumnWrapper = styled.div`
 
   & + & {
     margin-left: 12px;
+  }
+
+  .task-list {
+    scroll-behavior: smooth;
   }
 `;
 
@@ -208,16 +214,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 </div>
               </BoardColumnTitle>
 
-              <TaskList
-                column={props.column}
-                index={props.columnIndex}
-                tasks={props.tasks}
-                editTask={props.editTask}
-              />
-
-              <AddTask onClick={() => props.addTask(props.column.id)}>
-                <VscAdd />
-              </AddTask>
+              <TaskList {...props} />
             </BoardColumnWrapper>
           );
         }}
@@ -226,53 +223,72 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
   }
 );
 
-const TaskList = React.memo(({ column, index, tasks, editTask }: any) => {
+const TaskList = React.memo((props: BoardColumnProps) => {
   const { height } = useResponsive();
   const listRef = useRef<any>();
+  const [isAdd, setAdd] = useState(false);
   useLayoutEffect(() => {
     const list = listRef.current;
     if (list) {
       list.scrollTo(0);
     }
-  }, [index]);
+  }, [props.columnIndex]);
+  useEffect(() => {
+    if (isAdd) {
+      listRef.current.scrollToItem(props.column.tasksIds.length - 1);
+      setAdd(false);
+    }
+  }, [props.column.tasksIds.length]);
+  function addTaskAndScroll(columnId: string) {
+    props.addTask(columnId);
+    setAdd(true);
+  }
   let taskData = {
-    tasks: tasks,
-    editTask: (id: string, task: types.Task) => editTask(id, task),
+    tasks: props.tasks,
+    editTask: (id: string, task: types.Task) => props.editTask(id, task),
+    openTaskFile: (fileName: string) => props.openTaskFile(fileName),
   };
   return (
-    <Droppable
-      droppableId={column.id}
-      mode="virtual"
-      renderClone={(provided, snapshot, rubric) => (
-        <Task
-          provided={provided}
-          isDragging={snapshot.isDragging}
-          task={tasks[rubric.source.index]}
-        />
-      )}
-    >
-      {(provided, snapshot) => {
-        const itemCount = snapshot.isUsingPlaceholder
-          ? tasks.length + 1
-          : tasks.length;
-        return (
-          <FixedSizeList
-            height={height - 200}
-            itemCount={itemCount}
-            itemSize={110}
-            width={300}
-            outerRef={provided.innerRef}
-            itemData={taskData}
-            ref={listRef}
-            style={{
-              backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
-              transition: "background-color 0.2s ease",
-            }}
-          >
-            {BoardItem}
-          </FixedSizeList>
-        );
-      }}
-    </Droppable>
+    <>
+      <Droppable
+        droppableId={props.column.id}
+        mode="virtual"
+        renderClone={(provided, snapshot, rubric) => (
+          <Task
+            provided={provided}
+            isDragging={snapshot.isDragging}
+            task={props.tasks[rubric.source.index]}
+          />
+        )}
+      >
+        {(provided, snapshot) => {
+          const itemCount = snapshot.isUsingPlaceholder
+            ? props.tasks.length + 1
+            : props.tasks.length;
+          return (
+            <FixedSizeList
+              className="task-list"
+              height={height - 200}
+              itemCount={itemCount}
+              itemSize={110}
+              width={300}
+              outerRef={provided.innerRef}
+              itemData={taskData}
+              ref={listRef}
+              style={{
+                backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
+                transition: "background-color 0.2s ease",
+              }}
+            >
+              {BoardItem}
+            </FixedSizeList>
+          );
+        }}
+      </Droppable>
+
+      <AddTask onClick={() => addTaskAndScroll(props.column.id)}>
+        <VscAdd />
+      </AddTask>
+    </>
   );
 });

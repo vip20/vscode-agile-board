@@ -5,6 +5,7 @@ export interface Task {
   modifiedDate?: string;
   description: string;
   title: string;
+  files: string[];
 }
 
 export interface Column {

@@ -196,10 +196,25 @@ export default function Board({
       title: `Task${uid}`,
       description: `Edit Description`,
       createdDate: moment().toISOString(),
+      files: [],
     };
     newState.tasks[newTask.id] = newTask;
     newState.columns[columnId].tasksIds.push(newTask.id);
-    updateJsonConfig(newState);
+    vscodeApi.postMessage({
+      action: ACTION.addTaskFile,
+      boardName: state.boardName,
+      taskId: uid,
+      data: newState,
+    });
+    updateState(newState);
+  }
+
+  function openTaskFile(fileName: string) {
+    vscodeApi.postMessage({
+      action: ACTION.openTaskFile,
+      boardName: state.boardName,
+      fileName: fileName,
+    });
   }
 
   return (
@@ -248,6 +263,7 @@ export default function Board({
                   tasks: tasks,
                   editTask: (id: string, task: t.Task) => updateTask(id, task),
                   addTask: (columnId: string) => addTask(columnId),
+                  openTaskFile: (fileName: string) => openTaskFile(fileName),
                 };
                 // Render the BoardColumn component
                 return <BoardColumn {...data} />;

@@ -41,36 +41,43 @@ export const defaultBoardConfig2: t.Board = {
       id: "item-1",
       description: "Content of item 1.",
       title: "Title 1",
+      files: [],
     },
     "item-2": {
       id: "item-2",
       description: "Content of item 2.",
       title: "Title 2",
+      files: [],
     },
     "item-3": {
       id: "item-3",
       description: "Content of item 3.",
       title: "Title 3",
+      files: [],
     },
     "item-4": {
       id: "item-4",
       description: "Content of item 4.",
       title: "Title 4",
+      files: [],
     },
     "item-5": {
       id: "item-5",
       description: "Content of item 5.",
       title: "Title 5",
+      files: [],
     },
     "item-6": {
       id: "item-6",
       description: "Content of item 6.",
       title: "Title 6",
+      files: [],
     },
     "item-7": {
       id: "item-7",
       description: "Content of item 7.",
       title: "Title 7",
+      files: [],
     },
   },
   columns: {
@@ -109,6 +116,8 @@ export const ACTION = {
   fetchJson: "fetchJson",
   renameBoard: "renameBoard",
   allDirectories: "allDirectories",
+  addTaskFile: "addTaskFile",
+  openTaskFile: "openTaskFile",
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";

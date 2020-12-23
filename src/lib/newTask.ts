@@ -1,40 +1,44 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { resolveHome, createFileUtils } from "./utils";
-import moment from "moment";
+import * as fs from "fs-extra";
+import { createFileUtils } from "./utils";
 // This function handles creation of a new task in default board folder
-export function newTask(boardName: string) {
-  const config = vscode.workspace.getConfiguration("vsagile");
-  const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
 
-  if (boardFolder == null || !boardFolder) {
-    vscode.window.showErrorMessage(
-      "Default board folder not found. Please run setup."
-    );
-    return;
+export async function createTask(
+  boardFolder: string,
+  boardName: string,
+  taskId: string
+) {
+  let filePath = newFileName(path.join(boardFolder, boardName), taskId, "md");
+  if (filePath) {
+    let fullPath = path.join(boardFolder, boardName, filePath);
+    console.log(fullPath);
+    fs.createFileSync(fullPath);
+    openFileSide(fullPath);
   }
-  createTask(boardFolder, boardName);
+  return filePath;
 }
 
-async function createTask(boardFolder: string, boardName: string) {
-  let fileName = `${moment().format("YYYY-MM-DD_HH-mm-ss")}.md`;
-  const createFilePromise = createFileUtils(
-    path.join(boardFolder, boardName),
-    fileName
-  );
-  createFilePromise.then((filePath) => {
-    if (typeof filePath !== "string") {
-      console.error("Invalid file path");
-      return false;
-    }
+export function openFileSide(fullPath: string) {
+  vscode.window
+    .showTextDocument(vscode.Uri.file(fullPath), {
+      preserveFocus: false,
+      preview: false,
+      viewColumn: vscode.ViewColumn.Beside,
+    })
+    .then(() => {
+      console.log("Task created successfully: ", fullPath);
+    });
+}
 
-    vscode.window
-      .showTextDocument(vscode.Uri.file(filePath), {
-        preserveFocus: false,
-        preview: true,
-      })
-      .then(() => {
-        console.log("Task created successfully: ", filePath);
-      });
-  });
+function newFileName(pathName: string, fileName: string, ext: string) {
+  let counter = 1;
+  let newName = `${fileName}_${counter}.${ext}`;
+  let newPath = path.join(pathName, newName);
+  while (fs.existsSync(newPath)) {
+    newName = `${fileName}_${counter}.${ext}`;
+    newPath = path.join(pathName, newName);
+    counter++;
+  }
+  return newName;
 }

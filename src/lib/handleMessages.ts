@@ -3,6 +3,8 @@ import { ACTION, BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 import ReactPanel from "./reactPanel";
 import { getDirectories, updateConfigJson, updateDirName } from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
+import { createTask, openFileSide } from "./newTask";
+import * as t from "../core/types";
 
 // Handle messages from the webview
 export default function handleMessages(
@@ -35,6 +37,31 @@ export default function handleMessages(
             action: ACTION.allDirectories,
             data: getDirectories(boardFolder),
           });
+          return;
+        case ACTION.addTaskFile:
+          let data: t.Board = message.data;
+          let taskId = message.taskId;
+          let boardName = message.boardName.replace(
+            /\s/g,
+            BLANK_SPACE_ALTERNATIVE
+          );
+          createTask(boardFolder, boardName, taskId).then((fileName) => {
+            if (data.tasks[taskId].files) {
+              data.tasks[taskId].files.push(fileName);
+            } else {
+              data.tasks[taskId].files = [fileName];
+            }
+            let boardPath = path.join(boardFolder, boardName);
+            updateConfigJson(boardPath, data);
+          });
+          return;
+        case ACTION.openTaskFile:
+          let fullPath = path.join(
+            boardFolder,
+            message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
+            message.fileName
+          );
+          openFileSide(fullPath);
           return;
       }
     },
