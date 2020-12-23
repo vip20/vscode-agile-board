@@ -9,5 +9,6 @@ This project was bootstrapped with
 
 VSAgile is built keeping developers in mind. Where you don't have to search for the best note-taking app around when you already have one within your VS Code.
 
+![demo](https://github.com/vip20/vscode-agile-board/blob/main/demo/demo_1.gif)
 ## Note
 This project is in beta. Your suggestions would be appreciated.
