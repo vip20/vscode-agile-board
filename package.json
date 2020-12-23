@@ -1,13 +1,13 @@
 {
   "name": "vscode-agile-board",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.23.0"
   },
   "publisher": "vip20",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sqrdcodemons/vscode-agile-board"
+    "url": "https://github.com/vip20/vscode-agile-board"
   },
   "categories": [
     "Other"
