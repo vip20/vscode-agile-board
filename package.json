@@ -55,9 +55,6 @@
       }
     ]
   },
-  "extensionDependencies": [
-    "yzhang.markdown-all-in-one"
-  ],
   "dependencies": {
     "classnames": "^2.2.6",
     "fs-extra": "^9.0.1",
