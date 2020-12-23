@@ -228,7 +228,7 @@ export default function Board({
       boardName: state.boardName,
       fileNames: fileNames,
     });
-    updateState(newState);
+    updateJsonConfig(newState);
   }
 
   return (
