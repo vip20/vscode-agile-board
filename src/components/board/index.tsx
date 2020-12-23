@@ -2,12 +2,13 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
-import { BoardColumn } from "../board-column";
+import { BoardColumn, BoardColumnProps } from "../board-column";
 import { ACTION, COLUMN_ADD, defaultBoardConfig } from "../../core/constants";
 import * as t from "../../core/types";
 import { reorderList, uidGenerator } from "../../core/helpers";
 import InputBox from "../input-box";
 
+const moment = require("moment");
 const BoardName = styled.h1`
   text-align: center;
   height: 40px;
@@ -156,18 +157,26 @@ export default function Board({
   function updateColumnName(columnName: string, columnId: string) {
     const newState = { ...state };
     newState.columns[columnId].title = columnName;
+    newState.columns[columnId].modifiedDate = moment().toISOString();
+    updateJsonConfig(newState);
+  }
+
+  function updateTask(taskId: string, task: t.Task) {
+    const newState = { ...state };
+    newState.tasks[taskId] = task;
     updateJsonConfig(newState);
   }
 
   function addColumn(type: COLUMN_ADD, index: number) {
     const newState = { ...state };
-    const uid = uidGenerator();
+    const uid = `_${uidGenerator()}`;
     const atIndex = type === COLUMN_ADD.after ? index + 1 : index;
     const newColumn: t.Column = {
-      id: `_${uid}`,
+      id: uid,
       isDefault: false,
       tasksIds: [],
-      title: uid,
+      title: `Col${uid}`,
+      createdDate: moment().toISOString(),
     };
     newState.columns[newColumn.id] = newColumn;
     newState.columnsOrder.splice(atIndex, 0, newColumn.id);
@@ -178,6 +187,34 @@ export default function Board({
     delete newState.columns[columnId];
     newState.columnsOrder.splice(index, 1);
     updateJsonConfig(newState);
+  }
+  function addTask(columnId: string) {
+    const newState = { ...state };
+    const uid = `_${uidGenerator()}`;
+    const newTask: t.Task = {
+      id: uid,
+      title: `Task${uid}`,
+      description: `Edit Description`,
+      createdDate: moment().toISOString(),
+      files: [],
+    };
+    newState.tasks[newTask.id] = newTask;
+    newState.columns[columnId].tasksIds.push(newTask.id);
+    vscodeApi.postMessage({
+      action: ACTION.addTaskFile,
+      boardName: state.boardName,
+      taskId: uid,
+      data: newState,
+    });
+    updateState(newState);
+  }
+
+  function openTaskFile(fileName: string) {
+    vscodeApi.postMessage({
+      action: ACTION.openTaskFile,
+      boardName: state.boardName,
+      fileName: fileName,
+    });
   }
 
   return (
@@ -213,23 +250,23 @@ export default function Board({
                 const allColumnTitles = Object.values(state.columns as any).map(
                   (x: any) => x.title
                 );
+                const data: BoardColumnProps = {
+                  column: column,
+                  columnNames: allColumnTitles,
+                  key: column.id,
+                  columnIndex: index,
+                  editColumn: (e: string) => updateColumnName(e, column.id),
+                  addColumn: (type: COLUMN_ADD, index: number) =>
+                    addColumn(type, index),
+                  deleteColumn: (id: string, index: number) =>
+                    deleteColumn(id, index),
+                  tasks: tasks,
+                  editTask: (id: string, task: t.Task) => updateTask(id, task),
+                  addTask: (columnId: string) => addTask(columnId),
+                  openTaskFile: (fileName: string) => openTaskFile(fileName),
+                };
                 // Render the BoardColumn component
-                return (
-                  <BoardColumn
-                    applyChange={(e: string) => updateColumnName(e, column.id)}
-                    columnNames={allColumnTitles}
-                    key={column.id}
-                    column={column}
-                    tasks={tasks}
-                    index={index}
-                    addColumn={(type: COLUMN_ADD, index: number) =>
-                      addColumn(type, index)
-                    }
-                    deleteColumn={(id: string, index: number) =>
-                      deleteColumn(id, index)
-                    }
-                  />
-                );
+                return <BoardColumn {...data} />;
               })}
               {provided.placeholder}
             </div>

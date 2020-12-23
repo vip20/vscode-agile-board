@@ -4,6 +4,8 @@ export interface Task {
   createdDate?: string;
   modifiedDate?: string;
   description: string;
+  title: string;
+  files: string[];
 }
 
 export interface Column {
@@ -11,6 +13,8 @@ export interface Column {
   title: string;
   tasksIds: string[];
   isDefault: boolean;
+  createdDate?: string;
+  modifiedDate?: string;
 }
 
 export interface Board {

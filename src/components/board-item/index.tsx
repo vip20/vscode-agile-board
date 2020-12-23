@@ -1,14 +1,16 @@
 import * as React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
-import * as types from "../../core/types";
+import * as t from "../../core/types";
 import { areEqual } from "react-window";
-
+import InputBox from "../input-box";
+import { BsBoxArrowUpRight } from "react-icons/bs";
+const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
   index: number;
   style: any;
-  data: types.Task[];
+  data: { tasks: t.Task[]; editTask: Function; openTaskFile: Function };
 };
 
 // Define types for board item element style properties
@@ -17,6 +19,23 @@ type BoardItemStylesProps = {
   isDragging: boolean;
 };
 
+export const TaskCard = styled.div`
+  margin: 4px;
+  height: 100%;
+  width: 100%;
+`;
+
+export const TaskTitle = styled.h4`
+  flex: 0 0 80%;
+  margin: 0px;
+`;
+
+export const TitleRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  place-content: space-between;
+  padding: 8px;
+`;
 // Create style for board item element
 export const BoardItemEl = styled.div<BoardItemStylesProps>`
   background-color: ${(props) =>
@@ -29,7 +48,7 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
 
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
-    border-color: var(--vscode-editor-foreground);
+    border-color: var(--vscode-tab-inactiveBackground);
   }
 
   /* & + & {
@@ -40,10 +59,11 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
 // Create and export the BoardItem component
 export const BoardItem = React.memo(
   ({ data, index, style }: BoardItemProps) => {
-    const task: types.Task = data[index];
+    const task: t.Task = data.tasks[index];
     if (!task) {
       return null;
     }
+
     return (
       <Draggable draggableId={task.id} key={task.id} index={index}>
         {(provided, snapshot) => (
@@ -52,6 +72,7 @@ export const BoardItem = React.memo(
             isDragging={snapshot.isDragging}
             task={task}
             style={style}
+            data={data}
           />
         )}
       </Draggable>
@@ -60,7 +81,13 @@ export const BoardItem = React.memo(
   areEqual
 );
 
-export function Task({ provided, task, style, isDragging }: any) {
+export function Task({ provided, task, style, isDragging, data }: any) {
+  function editTaskByKey(value: string, type: string) {
+    const clonedTask = { ...task };
+    clonedTask[type] = value;
+    clonedTask.modifiedDate = moment().toISOString();
+    data.editTask(task.id, clonedTask);
+  }
   return (
     <BoardItemEl
       {...provided.draggableProps}
@@ -73,7 +100,25 @@ export function Task({ provided, task, style, isDragging }: any) {
         isDragging,
       })}
     >
-      <h4>{task.description}</h4>
+      <TaskCard>
+        <TitleRow>
+          <TaskTitle>
+            <InputBox
+              title="Edit Task Title"
+              value={task.title}
+              onChange={(e: string) => {}}
+              applyChange={(e: string) => editTaskByKey(e, "title")}
+              textAlign="left"
+            ></InputBox>
+          </TaskTitle>
+          <span
+            onClick={() => data.openTaskFile(task.files[0])}
+            className="cursor-pointer"
+          >
+            <BsBoxArrowUpRight />
+          </span>
+        </TitleRow>
+      </TaskCard>
     </BoardItemEl>
   );
 }

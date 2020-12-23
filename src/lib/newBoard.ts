@@ -19,7 +19,11 @@ const moment = require("moment");
 let allDirectories: string[] = [];
 
 export default function newBoard(boardFolder: string, extensionPath: string) {
-  if (boardFolder == null || !boardFolder) {
+  let boardExists = false;
+  if (boardFolder) {
+    boardExists = fs.existsSync(boardFolder);
+  }
+  if (!boardExists) {
     vscode.window.showErrorMessage(
       "Default board folder not found. Please run setup."
     );
@@ -81,6 +85,9 @@ function createBoard(
       boardName: value,
       createdDate: moment().toISOString(),
     };
+    ["backlog", "inProgress", "done", "closed"].forEach((x) => {
+      config.columns[x].createdDate = moment().toISOString();
+    });
     fs.writeJsonSync(boardConfigFile, config);
   }
   ReactPanel.createOrShow(extensionPath);

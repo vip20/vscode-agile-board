@@ -10,10 +10,10 @@ type InputBoxStyleProps = {
 export const InputBoxContainer = styled.div`
   .edit-icon {
     vertical-align: middle;
-    margin-left: 8px;
     visibility: hidden;
     cursor: pointer;
     font-size: 0.7em !important;
+    padding-top: 0.3em;
   }
   &:hover {
     .edit-icon {
@@ -31,6 +31,13 @@ export const InputBoxContainer = styled.div`
   .display {
     animation-name: appear;
     animation-duration: 1s;
+    max-width: 100%;
+    display: inline-flex;
+    .text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   @keyframes appear {
     from {
@@ -146,7 +153,9 @@ export default function InputBox({
         </>
       ) : (
         <span className="display">
-          {state}
+          <div className="text" title={state}>
+            {state}
+          </div>
           <span className="edit-icon" title={placeHolder} onClick={onEdit}>
             <VscEdit />
           </span>

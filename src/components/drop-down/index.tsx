@@ -2,12 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import * as React from "react";
 import { CSSTransition } from "react-transition-group";
 import "./index.scss";
-import {
-  VscArrowLeft,
-  VscChevronRight,
-  VscFlame,
-  VscSettingsGear,
-} from "react-icons/vsc";
+import { VscArrowLeft } from "react-icons/vsc";
 import * as t from "../../core/types";
 import classNames from "classnames";
 

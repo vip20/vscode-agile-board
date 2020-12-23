@@ -13,7 +13,7 @@ import { FixedSizeList, areEqual, FixedSizeGrid } from "react-window";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import InputBox from "../input-box";
 import useResponsive from "../../hooks/useResponsive";
-import { VscKebabVertical, VscChevronRight } from "react-icons/vsc";
+import { VscKebabVertical, VscChevronRight, VscAdd } from "react-icons/vsc";
 import DropdownMenu from "../drop-down";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import {
@@ -23,11 +23,33 @@ import {
   BiTrash,
 } from "react-icons/bi";
 import { COLUMN_ADD } from "../../core/constants";
+import { AST_PropAccess } from "terser";
+import { findDOMNode } from "react-dom";
 
+const AddTask = styled.div`
+  text-align: center;
+  width: 96%;
+  margin: 0 2%;
+  height: 15px;
+  font-size: 16px;
+  vertical-align: middle;
+  position: relative;
+  bottom: 0px;
+  padding: 10px 0;
+  background-color: var(--vscode-tab-inactiveBackground);
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  &:hover {
+    background-color: var(--vscode-editorGroupHeader-tabsBackground);
+    border-color: var(--vscode-tab-inactiveBackground);
+  }
+`;
 const ColumnTitle = styled.h2`
   text-align: left;
   height: 37px;
   margin: 0;
+  max-width: 80%;
   flex: 0 0 80%;
   /* padding: 2%; */
   border: 1px solid transparent;
@@ -37,15 +59,18 @@ const ColumnTitle = styled.h2`
   cursor: default;
 `;
 // Define types for board column element properties
-type BoardColumnProps = {
+export type BoardColumnProps = {
   key: string;
   column: types.Column;
   tasks: types.Task[];
-  index: number;
+  columnIndex: number;
   columnNames: string[];
-  applyChange: Function;
+  editColumn: Function;
   addColumn: Function;
   deleteColumn: Function;
+  editTask: Function;
+  addTask: Function;
+  openTaskFile: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -57,11 +82,16 @@ const BoardColumnWrapper = styled.div`
   /* background: none; */
   border-radius: 4px;
   min-width: 300px;
+  max-width: 300px;
   overflow-x: hidden;
   overflow-y: auto;
 
   & + & {
     margin-left: 12px;
+  }
+
+  .task-list {
+    scroll-behavior: smooth;
   }
 `;
 
@@ -84,15 +114,7 @@ function getBackgroundColor(isDraggingOver: boolean) {
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
-  ({
-    column,
-    index,
-    tasks,
-    columnNames,
-    applyChange,
-    addColumn,
-    deleteColumn,
-  }: BoardColumnProps) => {
+  (props: BoardColumnProps) => {
     const [nameErrMsg, setNameErrMsg] = useState("");
     const [columnName, setColumnName] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -103,17 +125,21 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
       setMenuOpen(false);
     });
     useEffect(() => {
-      const filteredDir: string[] = columnNames.filter(
-        (x: string) => x !== column.title
+      const filteredDir: string[] = props.columnNames.filter(
+        (x: string) => x !== props.column.title
       );
       if (filteredDir.indexOf(columnName) !== -1) {
         setNameErrMsg(`Column by name "${columnName}" already exists.`);
       } else {
         setNameErrMsg("");
       }
-    }, [columnName, columnNames]);
+    }, [columnName, props.columnNames]);
     return (
-      <Draggable draggableId={column.id} key={column.id} index={index}>
+      <Draggable
+        draggableId={props.column.id}
+        key={props.column.id}
+        index={props.columnIndex}
+      >
         {(provided) => {
           const dropdownMenu: types.DropdownMenu = {
             primary: {
@@ -128,9 +154,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "Delete Column",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    deleteColumn(column.id, index);
+                    props.deleteColumn(props.column.id, props.columnIndex);
                   },
-                  isDisabled: column.isDefault || column.tasksIds.length > 0,
+                  isDisabled:
+                    props.column.isDefault || props.column.tasksIds.length > 0,
                   leftIcon: <BiTrash />,
                 },
               ],
@@ -141,7 +168,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "Before This",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    addColumn(COLUMN_ADD.before, index);
+                    props.addColumn(COLUMN_ADD.before, props.columnIndex);
                   },
                   leftIcon: <BiArrowToLeft />,
                 },
@@ -149,7 +176,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   children: "After This",
                   callbackFn: () => {
                     setMenuOpen(false);
-                    addColumn(COLUMN_ADD.after, index);
+                    props.addColumn(COLUMN_ADD.after, props.columnIndex);
                   },
                   leftIcon: <BiArrowToRight />,
                 },
@@ -165,10 +192,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 <ColumnTitle>
                   <InputBox
                     title="Edit Column Name"
-                    value={column.title}
+                    value={props.column.title}
                     errMsg={nameErrMsg}
                     onChange={(e: string) => setColumnName(e)}
-                    applyChange={(e: string) => applyChange(e)}
+                    applyChange={(e: string) => props.editColumn(e)}
                     textAlign="left"
                   ></InputBox>
                 </ColumnTitle>
@@ -187,7 +214,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                 </div>
               </BoardColumnTitle>
 
-              <TaskList column={column} index={index} tasks={tasks} />
+              <TaskList {...props} />
             </BoardColumnWrapper>
           );
         }}
@@ -196,50 +223,72 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
   }
 );
 
-const TaskList = React.memo(({ column, index, tasks }: any) => {
+const TaskList = React.memo((props: BoardColumnProps) => {
   const { height } = useResponsive();
   const listRef = useRef<any>();
+  const [isAdd, setAdd] = useState(false);
   useLayoutEffect(() => {
     const list = listRef.current;
     if (list) {
       list.scrollTo(0);
     }
-  }, [index]);
-
+  }, [props.columnIndex]);
+  useEffect(() => {
+    if (isAdd) {
+      listRef.current.scrollToItem(props.column.tasksIds.length - 1);
+      setAdd(false);
+    }
+  }, [props.column.tasksIds.length]);
+  function addTaskAndScroll(columnId: string) {
+    props.addTask(columnId);
+    setAdd(true);
+  }
+  let taskData = {
+    tasks: props.tasks,
+    editTask: (id: string, task: types.Task) => props.editTask(id, task),
+    openTaskFile: (fileName: string) => props.openTaskFile(fileName),
+  };
   return (
-    <Droppable
-      droppableId={column.id}
-      mode="virtual"
-      renderClone={(provided, snapshot, rubric) => (
-        <Task
-          provided={provided}
-          isDragging={snapshot.isDragging}
-          task={tasks[rubric.source.index]}
-        />
-      )}
-    >
-      {(provided, snapshot) => {
-        const itemCount = snapshot.isUsingPlaceholder
-          ? tasks.length + 1
-          : tasks.length;
-        return (
-          <FixedSizeList
-            height={height - 180}
-            itemCount={itemCount}
-            itemSize={110}
-            width={300}
-            outerRef={provided.innerRef}
-            itemData={tasks}
-            ref={listRef}
-            style={{
-              backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
-              transition: "background-color 0.2s ease",
-            }}
-          >
-            {BoardItem}
-          </FixedSizeList>
-        );
-      }}
-    </Droppable>
+    <>
+      <Droppable
+        droppableId={props.column.id}
+        mode="virtual"
+        renderClone={(provided, snapshot, rubric) => (
+          <Task
+            provided={provided}
+            isDragging={snapshot.isDragging}
+            task={props.tasks[rubric.source.index]}
+          />
+        )}
+      >
+        {(provided, snapshot) => {
+          const itemCount = snapshot.isUsingPlaceholder
+            ? props.tasks.length + 1
+            : props.tasks.length;
+          return (
+            <FixedSizeList
+              className="task-list"
+              height={height - 200}
+              itemCount={itemCount}
+              itemSize={110}
+              width={300}
+              outerRef={provided.innerRef}
+              itemData={taskData}
+              ref={listRef}
+              style={{
+                backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
+                transition: "background-color 0.2s ease",
+              }}
+            >
+              {BoardItem}
+            </FixedSizeList>
+          );
+        }}
+      </Droppable>
+
+      <AddTask onClick={() => addTaskAndScroll(props.column.id)}>
+        <VscAdd />
+      </AddTask>
+    </>
   );
 });
