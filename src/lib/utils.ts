@@ -37,7 +37,6 @@ export function createFileUtils(folderPath: string, fileName: string) {
 }
 
 export function updateConfigJson(boardPath: string, data: types.Board) {
-  // console.log("update json", path.join(boardPath, "config.json"));
   fs.writeFileSync(path.join(boardPath, "config.json"), JSON.stringify(data));
 }
 

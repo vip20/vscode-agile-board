@@ -17,14 +17,14 @@ export default function handleMessages(
       switch (message.action) {
         case ACTION.alert:
           window.showErrorMessage(message.data);
-          return;
+          break;
         case ACTION.updateJson:
           let dirPath = path.join(
             boardFolder,
             message.board.replace(/\s/g, BLANK_SPACE_ALTERNATIVE)
           );
           updateConfigJson(dirPath, message.data);
-          return;
+          break;
         case ACTION.renameBoard:
           let toValue = message.to.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
           let fromValue = message.from.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
@@ -37,7 +37,7 @@ export default function handleMessages(
             action: ACTION.allDirectories,
             data: getDirectories(boardFolder),
           });
-          return;
+          break;
         case ACTION.addTaskFile:
           let data: t.Board = message.data;
           let taskId = message.taskId;
@@ -54,7 +54,7 @@ export default function handleMessages(
             let boardPath = path.join(boardFolder, boardName);
             updateConfigJson(boardPath, data);
           });
-          return;
+          break;
         case ACTION.openTaskFile:
           let fullPath = path.join(
             boardFolder,
@@ -62,7 +62,7 @@ export default function handleMessages(
             message.fileName
           );
           openFileSide(fullPath);
-          return;
+          break;
       }
     },
     null,

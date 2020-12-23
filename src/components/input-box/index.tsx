@@ -116,7 +116,6 @@ export default function InputBox({
   function updateValue(currentValue: string) {
     setEdit(false);
     if (currentValue && !err) {
-      console.log(currentValue);
       applyChange(currentValue);
     } else {
       onChange(value);

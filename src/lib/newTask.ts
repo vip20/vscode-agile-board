@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { createFileUtils } from "./utils";
+import { NEW_MD_FILE_TEXT } from "../core/constants";
 // This function handles creation of a new task in default board folder
 
 export async function createTask(
@@ -12,8 +13,8 @@ export async function createTask(
   let filePath = newFileName(path.join(boardFolder, boardName), taskId, "md");
   if (filePath) {
     let fullPath = path.join(boardFolder, boardName, filePath);
-    console.log(fullPath);
     fs.createFileSync(fullPath);
+    fs.writeFileSync(fullPath, NEW_MD_FILE_TEXT);
     openFileSide(fullPath);
   }
   return filePath;

@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
-import { BsBoxArrowRight } from "react-icons/bs";
+import { BsBoxArrowUpRight } from "react-icons/bs";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -111,12 +111,12 @@ export function Task({ provided, task, style, isDragging, data }: any) {
               textAlign="left"
             ></InputBox>
           </TaskTitle>
-          <div
+          <span
             onClick={() => data.openTaskFile(task.files[0])}
             className="cursor-pointer"
           >
-            <BsBoxArrowRight />
-          </div>
+            <BsBoxArrowUpRight />
+          </span>
         </TitleRow>
       </TaskCard>
     </BoardItemEl>
