@@ -2,7 +2,13 @@ import * as path from "path";
 import * as os from "os";
 import * as fs from "fs-extra";
 import * as types from "../core/types";
-import { window, QuickPickItem, Disposable, QuickInput } from "vscode";
+import {
+  window,
+  QuickPickItem,
+  Disposable,
+  QuickInput,
+  workspace,
+} from "vscode";
 import { QuickPickParameters } from "../core/types";
 import { BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 
@@ -34,6 +40,12 @@ export function createFileUtils(folderPath: string, fileName: string) {
         reject(err);
       });
   });
+}
+
+export function getBoardFolder() {
+  const config = workspace.getConfiguration("vsagile");
+  const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
+  return boardFolder;
 }
 
 export function updateConfigJson(boardPath: string, data: types.Board) {

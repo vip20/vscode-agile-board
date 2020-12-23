@@ -1,7 +1,12 @@
 import * as path from "path";
 import { ACTION, BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 import ReactPanel from "./reactPanel";
-import { getDirectories, updateConfigJson, updateDirName } from "./utils";
+import {
+  getBoardFolder,
+  getDirectories,
+  updateConfigJson,
+  updateDirName,
+} from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
 import { createTask, deleteFile, openFileSide } from "./newTask";
 import * as t from "../core/types";
@@ -9,11 +14,11 @@ import * as t from "../core/types";
 // Handle messages from the webview
 export default function handleMessages(
   panel: WebviewPanel,
-  boardFolder: string,
   _disposables: Disposable[]
 ) {
   panel.webview.onDidReceiveMessage(
     (message) => {
+      const boardFolder = getBoardFolder();
       switch (message.action) {
         case ACTION.alert:
           window.showErrorMessage(message.data);

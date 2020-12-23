@@ -2,7 +2,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { ACTION } from "../core/constants";
 import handleMessages from "./handleMessages";
-import { resolveHome, updateConfigJson } from "./utils";
 /**
  * Manages react webview panels
  */
@@ -57,13 +56,11 @@ export default class ReactPanel {
     );
     // Set the webview's initial html content
     this._panel.webview.html = this._getHtmlForWebview();
-    const config = vscode.workspace.getConfiguration("vsagile");
-    const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-    handleMessages(this._panel, boardFolder, this._disposables);
+    handleMessages(this._panel, this._disposables);
   }
 
   public doRefactor() {
