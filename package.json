@@ -1,6 +1,7 @@
 {
   "name": "vscode-agile-board",
-  "version": "1.0.1",
+  "displayName": "VSAgile",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.23.0"
   },

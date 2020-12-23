@@ -216,6 +216,20 @@ export default function Board({
       fileName: fileName,
     });
   }
+  function deleteTask(id: string, columnId: string) {
+    const newState = { ...state };
+    let fileNames = newState.tasks[id].files;
+    delete newState.tasks[id];
+    newState.columns[columnId].tasksIds = newState.columns[
+      columnId
+    ].tasksIds.filter((x) => x !== id);
+    vscodeApi.postMessage({
+      action: ACTION.deleteFiles,
+      boardName: state.boardName,
+      fileNames: fileNames,
+    });
+    updateState(newState);
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -264,6 +278,8 @@ export default function Board({
                   editTask: (id: string, task: t.Task) => updateTask(id, task),
                   addTask: (columnId: string) => addTask(columnId),
                   openTaskFile: (fileName: string) => openTaskFile(fileName),
+                  deleteTask: (id: string, columnId: string) =>
+                    deleteTask(id, columnId),
                 };
                 // Render the BoardColumn component
                 return <BoardColumn {...data} />;

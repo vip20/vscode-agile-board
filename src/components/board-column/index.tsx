@@ -71,6 +71,7 @@ export type BoardColumnProps = {
   editTask: Function;
   addTask: Function;
   openTaskFile: Function;
+  deleteTask: Function;
 };
 
 // Create styles for BoardColumnWrapper element
@@ -247,6 +248,7 @@ const TaskList = React.memo((props: BoardColumnProps) => {
     tasks: props.tasks,
     editTask: (id: string, task: types.Task) => props.editTask(id, task),
     openTaskFile: (fileName: string) => props.openTaskFile(fileName),
+    deleteTask: (id: string) => props.deleteTask(id, props.column.id),
   };
   return (
     <>

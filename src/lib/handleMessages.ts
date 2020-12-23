@@ -3,7 +3,7 @@ import { ACTION, BLANK_SPACE_ALTERNATIVE } from "../core/constants";
 import ReactPanel from "./reactPanel";
 import { getDirectories, updateConfigJson, updateDirName } from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
-import { createTask, openFileSide } from "./newTask";
+import { createTask, deleteFile, openFileSide } from "./newTask";
 import * as t from "../core/types";
 
 // Handle messages from the webview
@@ -66,6 +66,17 @@ export default function handleMessages(
             message.fileName
           );
           openFileSide(fullPath);
+          break;
+        case ACTION.deleteFiles:
+          let fileNames: string[] = message.fileNames;
+          fileNames.forEach((fileName) => {
+            let fullPath = path.join(
+              boardFolder,
+              message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
+              fileName
+            );
+            deleteFile(fullPath);
+          });
           break;
       }
     },

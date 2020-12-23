@@ -5,12 +5,18 @@ import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
 import { BsBoxArrowUpRight } from "react-icons/bs";
+import { BiTrash } from "react-icons/bi";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
   index: number;
   style: any;
-  data: { tasks: t.Task[]; editTask: Function; openTaskFile: Function };
+  data: {
+    tasks: t.Task[];
+    editTask: Function;
+    openTaskFile: Function;
+    deleteTask: Function;
+  };
 };
 
 // Define types for board item element style properties
@@ -114,8 +120,16 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           <span
             onClick={() => data.openTaskFile(task.files[0])}
             className="cursor-pointer"
+            title="Open task beside"
           >
             <BsBoxArrowUpRight />
+          </span>
+          <span
+            onClick={() => data.deleteTask(task.id)}
+            className="cursor-pointer"
+            title="Delete this task"
+          >
+            <BiTrash />
           </span>
         </TitleRow>
       </TaskCard>

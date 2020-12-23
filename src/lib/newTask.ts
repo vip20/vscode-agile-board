@@ -43,3 +43,7 @@ function newFileName(pathName: string, fileName: string, ext: string) {
   }
   return newName;
 }
+
+export function deleteFile(fullPath: string) {
+  fs.removeSync(fullPath);
+}

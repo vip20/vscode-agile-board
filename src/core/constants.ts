@@ -118,6 +118,7 @@ export const ACTION = {
   allDirectories: "allDirectories",
   addTaskFile: "addTaskFile",
   openTaskFile: "openTaskFile",
+  deleteFiles: "deleteFiles",
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";
