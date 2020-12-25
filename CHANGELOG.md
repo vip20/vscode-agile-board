@@ -1,6 +1,6 @@
 # Change log
 
-## [1.1.3] - 25th Dec, 2020
+## [1.1.4] - 25th Dec, 2020
 ---
 - Mention the limitation in README
 ## [1.1.3] - 25th Dec, 2020
