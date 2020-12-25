@@ -1,6 +1,6 @@
 # VSAgile 
 
-VSAgile is a simple tool to manage personal or organization level via VS Code. Considering Developers spending more time on VS Code, it would be simpler if a task board is available here.
+VSAgile, managing personal tasks is a command palette away. Considering Developers spending more time on VS Code, it would be simpler if a task board is available here.
 
 ## Demo
 ---
@@ -38,6 +38,9 @@ VSAgile is a simple tool to manage personal or organization level via VS Code. C
 VSAgile wouldn't have been this amazing without these people. Thank you!
 - [Contributors](https://github.com/vip20/vscode-agile-board/graphs/contributors)
 
+## PS
+---
+The tasks and config files are stored in the local computer. Users can save or share it via GitHub repositories if necessary.
 ## Reviews
 ---
 [Do you like VSAgile? Leave us a review.](https://marketplace.visualstudio.com/items?itemName=vip20.vscode-agile-board&ssr=false#review-details)
