@@ -2,7 +2,7 @@
   "name": "vscode-agile-board",
   "description": "A tool to manage work at personal or organization level through visual representation.",
   "displayName": "VSAgile",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "engines": {
     "vscode": "^1.23.0"
   },
@@ -24,7 +24,6 @@
     "notes"
   ],
   "activationEvents": [
-    "onCommand:vsagile.startDummy",
     "onCommand:vsagile.start",
     "onCommand:vsagile.setupBoard"
   ],
@@ -38,15 +37,11 @@
         "vsagile.defaultBoardPath": {
           "type": "string",
           "default": "",
-          "description": "Path to directory to save boards. Use ~/ to denote a relative path from home folder."
+          "description": "Path to the directory to save boards. Use ~/ to denote a relative path from home folder."
         }
       }
     },
     "commands": [
-      {
-        "command": "vsagile.startDummy",
-        "title": "VSAgile: Start Dummy Board"
-      },
       {
         "command": "vsagile.start",
         "title": "VSAgile: Start New Board"
