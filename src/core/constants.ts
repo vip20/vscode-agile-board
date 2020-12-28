@@ -130,3 +130,5 @@ export enum COLUMN_ADD {
   before,
   after,
 }
+
+export const PRIORITY_COLORS = ["transparent", "amber", "red"];

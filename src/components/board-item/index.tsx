@@ -6,6 +6,7 @@ import { areEqual } from "react-window";
 import InputBox from "../input-box";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { BiTrash } from "react-icons/bi";
+import { PRIORITY_COLORS } from "../../core/constants";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -23,11 +24,12 @@ type BoardItemProps = {
 // This is necessary for TypeScript to accept the 'isDragging' prop.
 type BoardItemStylesProps = {
   isDragging: boolean;
+  priority: number;
 };
 
 export const TaskCard = styled.div`
-  margin: 4px;
-  height: 100%;
+  margin: 4px 4px 4px 0px;
+  height: calc(100% - 4px);
   width: 100%;
 `;
 
@@ -51,7 +53,9 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
   border-radius: 4px;
   transition: background-color 0.25s ease-out;
   border: 1px solid transparent;
-
+  border-left: 4px solid transparent;
+  border-left-color: ${(props) =>
+    props.priority ? PRIORITY_COLORS[props.priority] : "transparent"};
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
     border-color: var(--vscode-tab-inactiveBackground);
@@ -100,6 +104,8 @@ export function Task({ provided, task, style, isDragging, data }: any) {
       {...provided.dragHandleProps}
       ref={provided.innerRef}
       isDragging={isDragging}
+      priority={task.priority}
+      onContextMenu={() => console.log("context")}
       style={getStyle({
         draggableStyle: provided.draggableProps.style,
         virtualStyle: style,

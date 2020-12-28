@@ -6,6 +6,7 @@ export interface Task {
   description: string;
   title: string;
   files: string[];
+  priority?: number;
 }
 
 export interface Column {
