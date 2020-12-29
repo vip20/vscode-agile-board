@@ -131,4 +131,4 @@ export enum COLUMN_ADD {
   after,
 }
 
-export const PRIORITY_COLORS = ["transparent", "amber", "red"];
+export const PRIORITY_COLORS = ["transparent", "orange", "red"];

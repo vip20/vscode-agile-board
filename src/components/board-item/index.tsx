@@ -72,6 +72,13 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
     border-color: var(--vscode-tab-inactiveBackground);
+    border-left-color: ${(props) =>
+      props.priority
+        ? PRIORITY_COLORS[props.priority]
+        : "var(--vscode-tab-inactiveBackground)"};
+  }
+  :focus {
+    outline: none;
   }
 
   /* & + & {
@@ -128,21 +135,24 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         {
           children: "High",
           leftIcon: <BsExclamationDiamond />,
+          callbackFn: () => data.editTask(itemId, { ...task, priority: 2 }),
         },
         {
           children: "Medium",
           leftIcon: <BsDiamondHalf />,
+          callbackFn: () => data.editTask(itemId, { ...task, priority: 1 }),
         },
         {
           children: "Low",
           leftIcon: (
             <CgArrowBottomLeftR style={{ transform: "rotate(315deg)" }} />
           ),
+          callbackFn: () => data.editTask(itemId, { ...task, priority: 0 }),
         },
-        {
-          children: "None",
-          leftIcon: <BsDiamond />,
-        },
+        // {
+        //   children: "None",
+        //   leftIcon: <BsDiamond />,
+        // },
       ],
     },
   };
