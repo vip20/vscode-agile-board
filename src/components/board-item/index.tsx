@@ -4,9 +4,21 @@ import styled from "@emotion/styled";
 import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
-import { BsBoxArrowUpRight } from "react-icons/bs";
-import { BiTrash } from "react-icons/bi";
+import {
+  BsBoxArrowUpRight,
+  BsExclamationDiamond,
+  BsDiamondHalf,
+  BsDiamond,
+} from "react-icons/bs";
+import { VscChevronRight } from "react-icons/vsc";
+import { CgArrowBottomLeftR } from "react-icons/cg";
+import { BiTrash, BiAddToQueue } from "react-icons/bi";
+import { GiRoundKnob } from "react-icons/gi";
 import { PRIORITY_COLORS } from "../../core/constants";
+import { useContextMenu } from "../../hooks/useContextMenu";
+import ContextMenu from "../context-menu";
+import { useRef } from "react";
+import useOutsideClick from "../../hooks/useOutsideClick";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -17,6 +29,7 @@ type BoardItemProps = {
     editTask: Function;
     openTaskFile: Function;
     deleteTask: Function;
+    outerRef: any;
   };
 };
 
@@ -98,14 +111,57 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     clonedTask.modifiedDate = moment().toISOString();
     data.editTask(task.id, clonedTask);
   }
+  const menuRef = useRef<any>();
+  const dropdownMenu: t.DropdownMenu = {
+    primary: {
+      main: [
+        {
+          children: "Change Priority",
+          goToMenu: "changePriority",
+          leftIcon: <GiRoundKnob />,
+          rightIcon: <VscChevronRight />,
+        },
+      ],
+    },
+    secondary: {
+      changePriority: [
+        {
+          children: "High",
+          leftIcon: <BsExclamationDiamond />,
+        },
+        {
+          children: "Medium",
+          leftIcon: <BsDiamondHalf />,
+        },
+        {
+          children: "Low",
+          leftIcon: (
+            <CgArrowBottomLeftR style={{ transform: "rotate(315deg)" }} />
+          ),
+        },
+        {
+          children: "None",
+          leftIcon: <BsDiamond />,
+        },
+      ],
+    },
+  };
+  const { xPos, yPos, showMenu, itemId } = useContextMenu(
+    data.outerRef,
+    menuRef,
+    0,
+    -150
+  );
+
   return (
     <BoardItemEl
+      className="task-card-parent"
+      id={task.id}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
       ref={provided.innerRef}
       isDragging={isDragging}
       priority={task.priority}
-      onContextMenu={() => console.log("context")}
       style={getStyle({
         draggableStyle: provided.draggableProps.style,
         virtualStyle: style,
@@ -139,6 +195,17 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           </span>
         </TitleRow>
       </TaskCard>
+      {showMenu && itemId === task.id && (
+        <div ref={menuRef}>
+          <ContextMenu
+            {...{
+              dropdownMenu,
+              xPos,
+              yPos,
+            }}
+          />
+        </div>
+      )}
     </BoardItemEl>
   );
 }

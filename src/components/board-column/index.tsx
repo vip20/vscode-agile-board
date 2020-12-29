@@ -228,6 +228,7 @@ const TaskList = React.memo((props: BoardColumnProps) => {
   const { height } = useResponsive();
   const listRef = useRef<any>();
   const [isAdd, setAdd] = useState(false);
+  const outerRef = useRef<any>(null);
   useLayoutEffect(() => {
     const list = listRef.current;
     if (list) {
@@ -249,6 +250,7 @@ const TaskList = React.memo((props: BoardColumnProps) => {
     editTask: (id: string, task: types.Task) => props.editTask(id, task),
     openTaskFile: (fileName: string) => props.openTaskFile(fileName),
     deleteTask: (id: string) => props.deleteTask(id, props.column.id),
+    outerRef: outerRef,
   };
   return (
     <>
@@ -260,6 +262,7 @@ const TaskList = React.memo((props: BoardColumnProps) => {
             provided={provided}
             isDragging={snapshot.isDragging}
             task={props.tasks[rubric.source.index]}
+            data={taskData}
           />
         )}
       >
@@ -268,22 +271,24 @@ const TaskList = React.memo((props: BoardColumnProps) => {
             ? props.tasks.length + 1
             : props.tasks.length;
           return (
-            <FixedSizeList
-              className="task-list"
-              height={height - 200}
-              itemCount={itemCount}
-              itemSize={110}
-              width={300}
-              outerRef={provided.innerRef}
-              itemData={taskData}
-              ref={listRef}
-              style={{
-                backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
-                transition: "background-color 0.2s ease",
-              }}
-            >
-              {BoardItem}
-            </FixedSizeList>
+            <div ref={outerRef}>
+              <FixedSizeList
+                className="task-list"
+                height={height - 200}
+                itemCount={itemCount}
+                itemSize={110}
+                width={300}
+                outerRef={provided.innerRef}
+                itemData={taskData}
+                ref={listRef}
+                style={{
+                  backgroundColor: getBackgroundColor(snapshot.isDraggingOver),
+                  transition: "background-color 0.2s ease",
+                }}
+              >
+                {BoardItem}
+              </FixedSizeList>
+            </div>
           );
         }}
       </Droppable>
