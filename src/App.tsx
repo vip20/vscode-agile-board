@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useContext } from "react";
 import "./App.css";
 import Board from "./components/board";
+import {
+  PriorityColorsContext,
+  PriorityColorsProvider,
+} from "./context/priorityColors";
 import { ACTION, defaultBoardConfig } from "./core/constants";
 import * as types from "./core/types";
 import { ResponsiveProvider } from "./hooks/useResponsive";
@@ -43,11 +48,13 @@ export default function App() {
   return (
     <>
       <ResponsiveProvider>
-        <Board
-          configJson={configJson}
-          vscodeApi={vscodeApi}
-          allDirectoryNames={allDirectories}
-        ></Board>
+        <PriorityColorsProvider>
+          <Board
+            configJson={configJson}
+            vscodeApi={vscodeApi}
+            allDirectoryNames={allDirectories}
+          ></Board>
+        </PriorityColorsProvider>
       </ResponsiveProvider>
     </>
   );

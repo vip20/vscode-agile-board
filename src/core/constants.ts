@@ -119,6 +119,8 @@ export const ACTION = {
   addTaskFile: "addTaskFile",
   openTaskFile: "openTaskFile",
   deleteFiles: "deleteFiles",
+  priorityColors: "priorityColors",
+  reFetchSettings: "reFetchSettings",
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";

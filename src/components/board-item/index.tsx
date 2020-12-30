@@ -14,11 +14,12 @@ import { VscChevronRight } from "react-icons/vsc";
 import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash, BiAddToQueue } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
-import { PRIORITY_COLORS } from "../../core/constants";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import ContextMenu from "../context-menu";
 import { useRef } from "react";
 import useOutsideClick from "../../hooks/useOutsideClick";
+import { useContext } from "react";
+import { PriorityColorsContext } from "../../context/priorityColors";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -38,6 +39,7 @@ type BoardItemProps = {
 type BoardItemStylesProps = {
   isDragging: boolean;
   priority: number;
+  priorityColors: string[];
 };
 
 export const TaskCard = styled.div`
@@ -68,13 +70,13 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
   border: 1px solid transparent;
   border-left: 4px solid transparent;
   border-left-color: ${(props) =>
-    props.priority ? PRIORITY_COLORS[props.priority] : "transparent"};
+    props.priority ? props.priorityColors[props.priority] : "transparent"};
   &:hover {
     background-color: var(--vscode-editorGroupHeader-tabsBackground);
     border-color: var(--vscode-tab-inactiveBackground);
     border-left-color: ${(props) =>
       props.priority
-        ? PRIORITY_COLORS[props.priority]
+        ? props.priorityColors[props.priority]
         : "var(--vscode-tab-inactiveBackground)"};
   }
   :focus {
@@ -162,6 +164,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     0,
     -150
   );
+  const [priorityColors, setPriorityColors] = useContext(PriorityColorsContext);
 
   return (
     <BoardItemEl
@@ -172,6 +175,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
       ref={provided.innerRef}
       isDragging={isDragging}
       priority={task.priority}
+      priorityColors={priorityColors}
       style={getStyle({
         draggableStyle: provided.draggableProps.style,
         virtualStyle: style,

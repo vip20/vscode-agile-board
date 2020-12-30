@@ -6,6 +6,8 @@ import {
   createFileUtils,
   getDirectories,
   showQuickPick,
+  getPriorityColorScheme,
+  reFetchSettings,
 } from "./utils";
 import {
   ACTION,
@@ -100,4 +102,5 @@ function createBoard(
     action: ACTION.allDirectories,
     data: allDirectories,
   });
+  reFetchSettings();
 }

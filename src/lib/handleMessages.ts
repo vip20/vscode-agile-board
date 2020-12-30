@@ -6,6 +6,7 @@ import {
   getDirectories,
   updateConfigJson,
   updateDirName,
+  reFetchSettings,
 } from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
 import { createTask, deleteFile, openFileSide } from "./newTask";
@@ -82,6 +83,9 @@ export default function handleMessages(
             );
             deleteFile(fullPath);
           });
+          break;
+        case ACTION.reFetchSettings:
+          reFetchSettings();
           break;
       }
     },

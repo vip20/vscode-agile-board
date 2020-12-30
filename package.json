@@ -38,6 +38,15 @@
           "type": "string",
           "default": "",
           "description": "Path to the directory to save boards. Use ~/ to denote a relative path from home folder."
+        },
+        "vsagile.priorityColorScheme": {
+          "type": "array",
+          "default": [
+            "transparent",
+            "orange",
+            "red"
+          ],
+          "description": "Set priority color for the task. This will be visible on the left border of the task. Priority is in the order ['Low', 'Medium', 'High']"
         }
       }
     },

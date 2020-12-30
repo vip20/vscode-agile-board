@@ -10,7 +10,8 @@ import {
   workspace,
 } from "vscode";
 import { QuickPickParameters } from "../core/types";
-import { BLANK_SPACE_ALTERNATIVE } from "../core/constants";
+import { ACTION, BLANK_SPACE_ALTERNATIVE } from "../core/constants";
+import ReactPanel from "./reactPanel";
 
 // Resolves the home tilde.
 export function resolveHome(filepath: string) {
@@ -46,6 +47,20 @@ export function getBoardFolder() {
   const config = workspace.getConfiguration("vsagile");
   const boardFolder = resolveHome(config.get("defaultBoardPath") || "");
   return boardFolder;
+}
+export function getPriorityColorScheme() {
+  const config = workspace.getConfiguration("vsagile");
+  const priorityColorScheme = resolveHome(
+    config.get("priorityColorScheme") || ""
+  );
+  return priorityColorScheme;
+}
+
+export function reFetchSettings() {
+  ReactPanel.panel.webview.postMessage({
+    action: ACTION.priorityColors,
+    data: getPriorityColorScheme(),
+  });
 }
 
 export function updateConfigJson(boardPath: string, data: types.Board) {
