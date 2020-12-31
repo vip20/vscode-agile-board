@@ -15,11 +15,11 @@ import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash, BiAddToQueue } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
 import { useContextMenu } from "../../hooks/useContextMenu";
-import ContextMenu from "../context-menu";
 import { useRef } from "react";
 import useOutsideClick from "../../hooks/useOutsideClick";
 import { useContext } from "react";
 import { PriorityColorsContext } from "../../context/priorityColors";
+import { ContextMenu } from "../context-menu";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -130,6 +130,11 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           leftIcon: <GiRoundKnob />,
           rightIcon: <VscChevronRight />,
         },
+        {
+          children: "Delete This Task",
+          leftIcon: <BiTrash />,
+          callbackFn: () => data.deleteTask(itemId),
+        },
       ],
     },
     secondary: {
@@ -162,9 +167,9 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     data.outerRef,
     menuRef,
     0,
-    -150
+    0
   );
-  const [priorityColors, setPriorityColors] = useContext(PriorityColorsContext);
+  const [priorityColors] = useContext(PriorityColorsContext);
 
   return (
     <BoardItemEl
@@ -200,23 +205,24 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           >
             <BsBoxArrowUpRight />
           </span>
-          <span
+          {/* <span
             onClick={() => data.deleteTask(task.id)}
             className="cursor-pointer"
             title="Delete this task"
           >
             <BiTrash />
-          </span>
+          </span> */}
         </TitleRow>
       </TaskCard>
       {showMenu && itemId === task.id && (
-        <div ref={menuRef}>
+        <div>
           <ContextMenu
             {...{
               dropdownMenu,
               xPos,
               yPos,
             }}
+            ref={menuRef}
           />
         </div>
       )}

@@ -128,7 +128,9 @@ export default class ReactPanel {
       <body>
       
 				<noscript>You need to enable JavaScript to run this app.</noscript>				<div id="root"></div>
-				<div id="root"></div>
+        <div id="root"></div>
+        
+    <div id="context-menu-root"></div>
 				
         <script>
                 const vscodeApi = acquireVsCodeApi();
