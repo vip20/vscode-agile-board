@@ -57,6 +57,7 @@ const ColumnTitle = styled.h2`
   font: 20px sans-serif;
   font-weight: 600;
   cursor: default;
+  display: inline-flex;
 `;
 // Define types for board column element properties
 export type BoardColumnProps = {
@@ -190,16 +191,26 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
               ref={provided.innerRef}
             >
               <BoardColumnTitle {...provided.dragHandleProps}>
-                <ColumnTitle>
-                  <InputBox
-                    title="Edit Column Name"
-                    value={props.column.title}
-                    errMsg={nameErrMsg}
-                    onChange={(e: string) => setColumnName(e)}
-                    applyChange={(e: string) => props.editColumn(e)}
-                    textAlign="left"
-                  ></InputBox>
-                </ColumnTitle>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    height: "100%",
+                    width: "100%",
+                  }}
+                >
+                  <ColumnTitle>
+                    <span>{props.column.tasksIds.length} |</span>
+                    &nbsp;
+                    <InputBox
+                      title="Edit Column Name"
+                      value={props.column.title}
+                      errMsg={nameErrMsg}
+                      onChange={(e: string) => setColumnName(e)}
+                      applyChange={(e: string) => props.editColumn(e)}
+                      textAlign="left"
+                    ></InputBox>
+                  </ColumnTitle>
+                </div>
                 <div ref={menuRef}>
                   <span
                     onClick={() => setMenuOpen(!menuOpen)}
