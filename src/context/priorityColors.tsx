@@ -19,7 +19,6 @@ export const PriorityColorsProvider = (props: any) => {
     if (message.action && message.data) {
       switch (message.action) {
         case ACTION.priorityColors:
-          console.log(message.data);
           setPriorityColors(message.data);
           break;
       }

@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect, Ref, useRef } from "react";
 import useOutsideClick from "./useOutsideClick";
+import useOutsideScroll from "./useOutsideScroll";
 
 export const useContextMenu = (
   outerRef: React.MutableRefObject<any>,
@@ -13,6 +14,9 @@ export const useContextMenu = (
   const [itemId, setItemId] = useState<any>(null);
 
   useOutsideClick(innerRef, () => {
+    setShowMenu(false);
+  });
+  useOutsideScroll(innerRef, () => {
     setShowMenu(false);
   });
   const handleContextMenu = useCallback(
