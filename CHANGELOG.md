@@ -1,6 +1,10 @@
 # Change log
 
+## [1.2.2] - 31st Dec, 2020
+---
+- Close the context menu when scrolled outside the menu container.
 ## [1.2.1] - 31st Dec, 2020
+---
 - Move the context menu to React Portal.
 - Display task count in the column header.
 - Move "Delete Task" inside the context menu.
