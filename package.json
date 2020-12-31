@@ -2,7 +2,7 @@
   "name": "vscode-agile-board",
   "description": "A tool to manage work at personal or organization level through visual representation.",
   "displayName": "VSAgile",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "engines": {
     "vscode": "^1.23.0"
   },
