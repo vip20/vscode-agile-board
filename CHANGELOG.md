@@ -2,8 +2,8 @@
 
 ## [1.2.1] - 31st Dec, 2020
 - Move the context menu to React Portal.
-- Display task count in column header.
-- Move "Delete Task" inside context menu.
+- Display task count in the column header.
+- Move "Delete Task" inside the context menu.
 ## [1.2.0] - 30th Dec, 2020
 ---
 - Right-click on tasks displays a menu.
