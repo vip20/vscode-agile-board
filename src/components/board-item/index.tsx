@@ -4,19 +4,13 @@ import styled from "@emotion/styled";
 import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
-import {
-  BsBoxArrowUpRight,
-  BsExclamationDiamond,
-  BsDiamondHalf,
-  BsDiamond,
-} from "react-icons/bs";
+import { BsExclamationDiamond, BsDiamondHalf } from "react-icons/bs";
 import { VscChevronRight } from "react-icons/vsc";
 import { CgArrowBottomLeftR } from "react-icons/cg";
-import { BiTrash, BiAddToQueue } from "react-icons/bi";
+import { BiTrash } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import { useRef } from "react";
-import useOutsideClick from "../../hooks/useOutsideClick";
 import { useContext } from "react";
 import { PriorityColorsContext } from "../../context/priorityColors";
 import { ContextMenu } from "../context-menu";
@@ -173,6 +167,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
 
   return (
     <BoardItemEl
+      onClick={() => data.openTaskFile(task.files[0])}
       className="task-card-parent"
       id={task.id}
       {...provided.draggableProps}
@@ -183,7 +178,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
       priorityColors={priorityColors}
       style={getStyle({
         draggableStyle: provided.draggableProps.style,
-        virtualStyle: style,
+        virtualStyle: { ...style, cursor: "pointer" },
         isDragging,
       })}
     >
@@ -198,13 +193,13 @@ export function Task({ provided, task, style, isDragging, data }: any) {
               textAlign="left"
             ></InputBox>
           </TaskTitle>
-          <span
+          {/* <span
             onClick={() => data.openTaskFile(task.files[0])}
             className="cursor-pointer"
             title="Open task beside"
           >
             <BsBoxArrowUpRight />
-          </span>
+          </span> */}
           {/* <span
             onClick={() => data.deleteTask(task.id)}
             className="cursor-pointer"
