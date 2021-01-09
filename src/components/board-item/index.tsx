@@ -9,11 +9,15 @@ import { VscChevronRight } from "react-icons/vsc";
 import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
+import { IoIosTimer } from "react-icons/io";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import { useRef } from "react";
 import { useContext } from "react";
 import { PriorityColorsContext } from "../../context/priorityColors";
 import { ContextMenu } from "../context-menu";
+import ReactDatetimeClass from "react-datetime";
+import "react-datetime/css/react-datetime.css";
+import "./index.scss";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -129,6 +133,12 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           leftIcon: <BiTrash />,
           callbackFn: () => data.deleteTask(itemId),
         },
+        {
+          children: "Set Due By",
+          goToMenu: "setDueBy",
+          leftIcon: <IoIosTimer />,
+          rightIcon: <VscChevronRight />,
+        },
       ],
     },
     secondary: {
@@ -155,6 +165,15 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         //   leftIcon: <BsDiamond />,
         // },
       ],
+      setDueBy: [
+        {
+          children: (
+            <>
+              <ReactDatetimeClass input={false} open={true} />
+            </>
+          ),
+        },
+      ],
     },
   };
   const { xPos, yPos, showMenu, itemId } = useContextMenu(
@@ -167,7 +186,6 @@ export function Task({ provided, task, style, isDragging, data }: any) {
 
   return (
     <BoardItemEl
-      onClick={() => data.openTaskFile(task.files[0])}
       className="task-card-parent"
       id={task.id}
       {...provided.draggableProps}
@@ -182,7 +200,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         isDragging,
       })}
     >
-      <TaskCard>
+      <TaskCard onClick={() => data.openTaskFile(task.files[0])}>
         <TitleRow>
           <TaskTitle>
             <InputBox

@@ -12,7 +12,7 @@
   position: absolute;
   z-index: 1001;
   height: auto;
-  width: 200px;
+  min-width: 200px;
   transform: translateX(-45%);
   background-color: var(--bg);
   border: var(--border);
@@ -27,7 +27,7 @@
 }
 
 .menu-item {
-  height: 30px;
+  min-height: 30px;
   display: flex;
   align-items: center;
   transition: background var(--speed);

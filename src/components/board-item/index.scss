@@ -1,0 +1,17 @@
+.rdtPicker {
+  background-color: transparent;
+  border: none;
+  .rdtActive {
+    background-color: var(--vscode-button-background);
+  }
+  td.rdtToday:before {
+    border-bottom-color: var(--vscode-button-background);
+  }
+  .rdtPicker thead tr:first-of-type th:hover {
+    background-color: #eeeeee2e;
+  }
+
+  td:hover {
+    background-color: #eeeeee2e;
+  }
+}
