@@ -10,6 +10,7 @@ import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
 import { IoIosTimer } from "react-icons/io";
+import { MdCheck, MdClear } from "react-icons/md";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import { useRef } from "react";
 import { useContext } from "react";
@@ -18,6 +19,7 @@ import { ContextMenu } from "../context-menu";
 import ReactDatetimeClass from "react-datetime";
 import "react-datetime/css/react-datetime.css";
 import "./index.scss";
+import { useState } from "react";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -118,6 +120,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     clonedTask.modifiedDate = moment().toISOString();
     data.editTask(task.id, clonedTask);
   }
+  const [dtPicker, setDTPicker] = useState(moment().toISOString());
   const menuRef = useRef<any>();
   const dropdownMenu: t.DropdownMenu = {
     primary: {
@@ -134,8 +137,8 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           callbackFn: () => data.deleteTask(itemId),
         },
         {
-          children: "Set Due By",
-          goToMenu: "setDueBy",
+          children: "Set Deadline",
+          goToMenu: "setDeadline",
           leftIcon: <IoIosTimer />,
           rightIcon: <VscChevronRight />,
         },
@@ -165,13 +168,28 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         //   leftIcon: <BsDiamond />,
         // },
       ],
-      setDueBy: [
+      setDeadline: [
         {
+          transparentOnHover: true,
           children: (
             <>
-              <ReactDatetimeClass input={false} open={true} />
+              <ReactDatetimeClass
+                input={false}
+                open={true}
+                onChange={(val: any) => console.log(val.toISOString())}
+              />
             </>
           ),
+        },
+        {
+          children: `Apply Deadline: ${dtPicker}`,
+          leftIcon: <MdCheck />,
+          isDisabled: false,
+        },
+        {
+          children: "Clear Deadline",
+          isDisabled: false,
+          leftIcon: <MdClear />,
         },
       ],
     },

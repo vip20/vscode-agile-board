@@ -19,7 +19,7 @@
   border-radius: var(--border-radius);
   padding: 0;
   overflow: hidden;
-  transition: height var(--speed) ease;
+  transition: height var(--speed) ease, width var(--speed) ease;
 }
 
 .menu {
@@ -36,8 +36,10 @@
   text-decoration: none;
   font-size: 1em;
   &:hover {
-    background-color: var(--bg-accent);
     color: inherit;
+    &.on-hover {
+      background-color: var(--bg-accent);
+    }
   }
   &.disabled {
     color: var(--bg-accent);

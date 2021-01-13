@@ -39,6 +39,7 @@ export interface DropdownItem {
   goToMenu?: string;
   callbackFn?: Function;
   isDisabled?: boolean;
+  transparentOnHover?: boolean;
   children: JSX.Element | string;
 }
 export interface DropdownMenu {

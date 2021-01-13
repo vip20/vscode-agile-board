@@ -47,6 +47,7 @@ const AddTask = styled.div`
 `;
 const ColumnTitle = styled.h2`
   text-align: left;
+  align-items: baseline;
   height: 37px;
   margin: 0;
   max-width: 80%;
@@ -58,6 +59,10 @@ const ColumnTitle = styled.h2`
   font-weight: 600;
   cursor: default;
   display: inline-flex;
+  .count {
+    font-size: small;
+    padding-bottom: 2px;
+  }
 `;
 // Define types for board column element properties
 export type BoardColumnProps = {
@@ -199,8 +204,10 @@ export const BoardColumn: React.FC<BoardColumnProps> = React.memo(
                   }}
                 >
                   <ColumnTitle>
-                    <span>{props.column.tasksIds.length} |</span>
-                    &nbsp;
+                    <span className="count">
+                      ({props.column.tasksIds.length})
+                    </span>
+                    &thinsp;
                     <InputBox
                       title="Edit Column Name"
                       value={props.column.title}

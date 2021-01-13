@@ -10,7 +10,7 @@ const startCase = require("lodash.startcase");
 
 export default function DropdownMenu(menu: t.DropdownMenu) {
   const [activeMenu, setActiveMenu] = useState("main");
-  const [menuHeight, setMenuHeight] = useState<number>(0);
+  const [menuHeight, setMenuHeight] = useState<string | number>(0);
   const dropdownRef = useRef<any>(null);
 
   useEffect(() => {
@@ -37,6 +37,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
     }
     const menuClass = classNames({
       "menu-item": true,
+      "on-hover": !props.transparentOnHover,
       disabled: props.isDisabled,
     });
     return (
@@ -57,7 +58,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
       {primaryItems && (
         <CSSTransition
           in={activeMenu === "main"}
-          timeout={500}
+          timeout={200}
           classNames="menu-primary"
           unmountOnExit
           onEnter={calcHeight}
@@ -78,10 +79,10 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
           return (
             <CSSTransition
               in={activeMenu === `${k}`}
-              timeout={500}
+              timeout={200}
               classNames="menu-secondary"
               unmountOnExit
-              onEnter={calcHeight}
+              onEnter={() => setMenuHeight("auto")}
             >
               <div className="menu">
                 <DropdownItem goToMenu="main" leftIcon={<VscArrowLeft />}>
