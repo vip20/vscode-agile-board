@@ -1,5 +1,10 @@
 # Change log
 
+## [1.2.3] - 15th Jan, 2021
+- Set deadline for tasks on right-click.
+- Open task on click.
+- Refetch the config when the tab changes.
+- Close the context-menu on the item selection.
 ## [1.2.2] - 31st Dec, 2020
 ---
 - Close the context menu when scrolled outside the menu container.

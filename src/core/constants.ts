@@ -121,6 +121,7 @@ export const ACTION = {
   deleteFiles: "deleteFiles",
   priorityColors: "priorityColors",
   reFetchSettings: "reFetchSettings",
+  reFetchConfig: "reFetchConfig",
 };
 
 export const BLANK_SPACE_ALTERNATIVE = "_";

@@ -34,9 +34,12 @@ export default function Board({
     let oldState = vscodeApi.getState();
     // when there is a state available use that to display webview works when tab changes
     if (oldState && oldState !== state) {
-      setState(oldState);
       vscodeApi.postMessage({
         action: ACTION.reFetchSettings,
+      });
+      vscodeApi.postMessage({
+        action: ACTION.reFetchConfig,
+        boardName: oldState.boardName,
       });
     }
   }, [vscodeApi]);

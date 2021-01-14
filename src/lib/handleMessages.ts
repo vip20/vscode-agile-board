@@ -7,6 +7,7 @@ import {
   updateConfigJson,
   updateDirName,
   reFetchSettings,
+  reFetchConfig,
 } from "./utils";
 import { window, Disposable, WebviewPanel } from "vscode";
 import { createTask, deleteFile, openFileSide } from "./newTask";
@@ -86,6 +87,11 @@ export default function handleMessages(
           break;
         case ACTION.reFetchSettings:
           reFetchSettings();
+          break;
+        case ACTION.reFetchConfig:
+          reFetchConfig(
+            message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE)
+          );
           break;
       }
     },

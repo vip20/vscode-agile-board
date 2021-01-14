@@ -8,6 +8,7 @@ import {
   showQuickPick,
   getPriorityColorScheme,
   reFetchSettings,
+  getBoardFolder,
 } from "./utils";
 import {
   ACTION,

@@ -3,6 +3,7 @@ export interface Task {
   id: string;
   createdDate?: string;
   modifiedDate?: string;
+  dueDate?: string;
   description: string;
   title: string;
   files: string[];

@@ -9,10 +9,10 @@ import { VscChevronRight } from "react-icons/vsc";
 import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
-import { IoIosTimer } from "react-icons/io";
+import { RiTimerFlashFill } from "react-icons/ri";
 import { MdCheck, MdClear } from "react-icons/md";
 import { useContextMenu } from "../../hooks/useContextMenu";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useContext } from "react";
 import { PriorityColorsContext } from "../../context/priorityColors";
 import { ContextMenu } from "../context-menu";
@@ -46,6 +46,9 @@ export const TaskCard = styled.div`
   margin: 4px 4px 4px 0px;
   height: calc(100% - 4px);
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 export const TaskTitle = styled.h4`
@@ -88,6 +91,12 @@ export const BoardItemEl = styled.div<BoardItemStylesProps>`
   } */
 `;
 
+export const TaskCardFooter = styled.div`
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+`;
+
 // Create and export the BoardItem component
 export const BoardItem = React.memo(
   ({ data, index, style }: BoardItemProps) => {
@@ -120,8 +129,17 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     clonedTask.modifiedDate = moment().toISOString();
     data.editTask(task.id, clonedTask);
   }
-  const [dtPicker, setDTPicker] = useState(moment().toISOString());
+  const [dueDateText, setDueDateText] = useState("");
+  useEffect(() => {
+    setDueDateText(moment(task.dueDate).fromNow());
+  }, [task.dueDate]);
+
+  const dtPickerRef = useRef<any>(moment().toISOString());
   const menuRef = useRef<any>();
+  var yesterday = moment().subtract(1, "day");
+  var valid = (current: any) => {
+    return current.isAfter(yesterday);
+  };
   const dropdownMenu: t.DropdownMenu = {
     primary: {
       main: [
@@ -139,7 +157,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         {
           children: "Set Deadline",
           goToMenu: "setDeadline",
-          leftIcon: <IoIosTimer />,
+          leftIcon: <RiTimerFlashFill />,
           rightIcon: <VscChevronRight />,
         },
       ],
@@ -149,19 +167,28 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         {
           children: "High",
           leftIcon: <BsExclamationDiamond />,
-          callbackFn: () => data.editTask(itemId, { ...task, priority: 2 }),
+          callbackFn: () => {
+            setShowMenu(false);
+            data.editTask(itemId, { ...task, priority: 2 });
+          },
         },
         {
           children: "Medium",
           leftIcon: <BsDiamondHalf />,
-          callbackFn: () => data.editTask(itemId, { ...task, priority: 1 }),
+          callbackFn: () => {
+            setShowMenu(false);
+            data.editTask(itemId, { ...task, priority: 1 });
+          },
         },
         {
           children: "Low",
           leftIcon: (
             <CgArrowBottomLeftR style={{ transform: "rotate(315deg)" }} />
           ),
-          callbackFn: () => data.editTask(itemId, { ...task, priority: 0 }),
+          callbackFn: () => {
+            setShowMenu(false);
+            data.editTask(itemId, { ...task, priority: 0 });
+          },
         },
         // {
         //   children: "None",
@@ -176,25 +203,37 @@ export function Task({ provided, task, style, isDragging, data }: any) {
               <ReactDatetimeClass
                 input={false}
                 open={true}
-                onChange={(val: any) => console.log(val.toISOString())}
+                isValidDate={valid}
+                initialValue={moment(dtPickerRef.current)}
+                onChange={(val: any) => {
+                  dtPickerRef.current = val.toISOString();
+                }}
               />
             </>
           ),
         },
         {
-          children: `Apply Deadline: ${dtPicker}`,
+          children: `Apply Deadline`,
           leftIcon: <MdCheck />,
           isDisabled: false,
+          callbackFn: () => {
+            setShowMenu(false);
+            data.editTask(itemId, { ...task, dueDate: dtPickerRef.current });
+          },
         },
         {
           children: "Clear Deadline",
           isDisabled: false,
           leftIcon: <MdClear />,
+          callbackFn: () => {
+            setShowMenu(false);
+            data.editTask(itemId, { ...task, dueDate: null });
+          },
         },
       ],
     },
   };
-  const { xPos, yPos, showMenu, itemId } = useContextMenu(
+  const { xPos, yPos, showMenu, itemId, setShowMenu } = useContextMenu(
     data.outerRef,
     menuRef,
     0,
@@ -229,21 +268,27 @@ export function Task({ provided, task, style, isDragging, data }: any) {
               textAlign="left"
             ></InputBox>
           </TaskTitle>
-          {/* <span
-            onClick={() => data.openTaskFile(task.files[0])}
-            className="cursor-pointer"
-            title="Open task beside"
-          >
-            <BsBoxArrowUpRight />
-          </span> */}
-          {/* <span
-            onClick={() => data.deleteTask(task.id)}
-            className="cursor-pointer"
-            title="Delete this task"
-          >
-            <BiTrash />
-          </span> */}
         </TitleRow>
+        <TaskCardFooter>
+          {task.dueDate && (
+            <div
+              title={`Due: ${moment(task.dueDate).format("lll")}`}
+              style={{
+                fontSize: "0.8em",
+              }}
+            >
+              <RiTimerFlashFill
+                style={{
+                  color:
+                    dueDateText.indexOf("ago") !== -1
+                      ? priorityColors[2]
+                      : priorityColors[1],
+                }}
+              />
+              &thinsp;{`Due ${dueDateText}`}
+            </div>
+          )}
+        </TaskCardFooter>
       </TaskCard>
       {showMenu && itemId === task.id && (
         <div>

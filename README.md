@@ -11,7 +11,7 @@ VSAgile, managing personal tasks is a command palette away. Considering Develope
 ---
 - Access command quickly from VSCode command palette `Cmd/Ctrl + Shift + P`
 - Setup base folder for your Agile Boards `VSAgile: Run Setup`.
-- Create a new board or select existing under `VSAgile: Start New Board`.
+- Create a new board or select existing under `VSAgile: Start New/Open Existing Board`.
 - Add new columns or edit existing columns. Every board starts with a default set of columns, which cannot be deleted.
 - Create a new task with the add button visible at the bottom of every column.
 - A markdown file will be created whenever a new task is added, the same will be opened on a new view group beside the current task view.

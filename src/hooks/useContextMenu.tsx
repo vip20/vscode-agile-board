@@ -53,5 +53,5 @@ export const useContextMenu = (
     };
   });
 
-  return { xPos, yPos, showMenu, itemId };
+  return { xPos, yPos, showMenu, itemId, setShowMenu };
 };

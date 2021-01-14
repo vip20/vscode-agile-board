@@ -122,3 +122,18 @@ export async function showQuickPick<
 export function updateDirName(fromDir: string, toDir: string) {
   fs.renameSync(fromDir, toDir);
 }
+
+export const reFetchConfig = (boardName: string) => {
+  const boardFolder = getBoardFolder();
+  let dir = path.join(boardFolder, boardName);
+  let boardConfigFile = path.join(dir, "config.json");
+
+  fs.ensureDirSync(dir);
+  fs.ensureFileSync(boardConfigFile);
+  let config: types.Board = fs.readJSONSync(boardConfigFile, { throws: false });
+
+  ReactPanel.panel.webview.postMessage({
+    action: ACTION.fetchJson,
+    data: config,
+  });
+};
