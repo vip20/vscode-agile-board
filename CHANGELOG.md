@@ -1,5 +1,8 @@
 # Change log
 
+## [1.2.4] - 16th Jan, 2021
+- Fix: Display context menu based on page height
+- Add logo to VSAgile
 ## [1.2.3] - 15th Jan, 2021
 - Set deadline for tasks on right-click.
 - Open task on click.
