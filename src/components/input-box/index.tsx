@@ -122,7 +122,8 @@ export default function InputBox({
     }
   }
 
-  function onEdit() {
+  function onEdit(e: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
+    e.stopPropagation();
     setEdit(true);
     onChange(value);
   }
@@ -156,7 +157,11 @@ export default function InputBox({
           <div className="text" title={state}>
             {state}
           </div>
-          <span className="edit-icon" title={placeHolder} onClick={onEdit}>
+          <span
+            className="edit-icon"
+            title={placeHolder}
+            onClick={(e) => onEdit(e)}
+          >
             <VscEdit />
           </span>
         </span>
