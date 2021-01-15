@@ -54,7 +54,14 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
   const secondaryKeys = menu.secondary ? Object.keys(menu.secondary) : null;
 
   return (
-    <div className="dropdown" style={{ height: menuHeight }} ref={dropdownRef}>
+    <div
+      className="dropdown"
+      style={{
+        height: menuHeight,
+        bottom: menu.config && menu.config.isBottom ? "16px" : "unset",
+      }}
+      ref={dropdownRef}
+    >
       {primaryItems && (
         <CSSTransition
           in={activeMenu === "main"}

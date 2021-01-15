@@ -46,4 +46,9 @@ export interface DropdownItem {
 export interface DropdownMenu {
   primary: { main: DropdownItem[] };
   secondary?: { [key: string]: DropdownItem[] };
+  config?: DropdownMenuConfig;
+}
+
+export interface DropdownMenuConfig {
+  isBottom?: boolean;
 }

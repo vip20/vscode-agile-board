@@ -20,6 +20,7 @@ import ReactDatetimeClass from "react-datetime";
 import "react-datetime/css/react-datetime.css";
 import "./index.scss";
 import { useState } from "react";
+import useResponsive from "../../hooks/useResponsive";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -136,6 +137,14 @@ export function Task({ provided, task, style, isDragging, data }: any) {
 
   const dtPickerRef = useRef<any>(moment().toISOString());
   const menuRef = useRef<any>();
+  const { height } = useResponsive();
+  const { xPos, yPos, showMenu, itemId, setShowMenu } = useContextMenu(
+    data.outerRef,
+    menuRef,
+    0,
+    0
+  );
+  const [priorityColors] = useContext(PriorityColorsContext);
   var yesterday = moment().subtract(1, "day");
   var valid = (current: any) => {
     return current.isAfter(yesterday);
@@ -232,14 +241,10 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         },
       ],
     },
+    config: {
+      isBottom: height - yPos < 440,
+    },
   };
-  const { xPos, yPos, showMenu, itemId, setShowMenu } = useContextMenu(
-    data.outerRef,
-    menuRef,
-    0,
-    0
-  );
-  const [priorityColors] = useContext(PriorityColorsContext);
 
   return (
     <BoardItemEl
@@ -295,8 +300,8 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           <ContextMenu
             {...{
               dropdownMenu,
-              xPos,
-              yPos,
+              xPos: `${xPos}px`,
+              yPos: `${yPos}px`,
             }}
             ref={menuRef}
           />
