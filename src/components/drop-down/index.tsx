@@ -25,7 +25,8 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
   }
 
   function DropdownItem(props: t.DropdownItem) {
-    function itemClick() {
+    function itemClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+      e.stopPropagation();
       if (!props.isDisabled) {
         if (props.callbackFn) {
           props.callbackFn();
@@ -41,7 +42,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
       disabled: props.isDisabled,
     });
     return (
-      <a href="#" className={menuClass} onClick={() => itemClick()}>
+      <a href="#" className={menuClass} onClick={(e) => itemClick(e)}>
         <span className="icon-button">{props.leftIcon}</span>
         {props.children}
         <span className="icon-right">{props.rightIcon}</span>

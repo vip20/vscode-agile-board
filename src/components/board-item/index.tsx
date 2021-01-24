@@ -5,7 +5,7 @@ import * as t from "../../core/types";
 import { areEqual } from "react-window";
 import InputBox from "../input-box";
 import { BsExclamationDiamond, BsDiamondHalf } from "react-icons/bs";
-import { VscChevronRight } from "react-icons/vsc";
+import { VscChevronRight, VscKebabVertical } from "react-icons/vsc";
 import { CgArrowBottomLeftR } from "react-icons/cg";
 import { BiTrash } from "react-icons/bi";
 import { GiRoundKnob } from "react-icons/gi";
@@ -21,6 +21,8 @@ import "react-datetime/css/react-datetime.css";
 import "./index.scss";
 import { useState } from "react";
 import useResponsive from "../../hooks/useResponsive";
+import DropdownMenu from "../drop-down";
+import useOutsideClick from "../../hooks/useOutsideClick";
 const moment = require("moment");
 // Define types for board item element properties
 type BoardItemProps = {
@@ -131,21 +133,21 @@ export function Task({ provided, task, style, isDragging, data }: any) {
     data.editTask(task.id, clonedTask);
   }
   const [dueDateText, setDueDateText] = useState("");
+  const [yPos, setYPos] = useState(0);
+  const [xPos, setXPos] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
+  const dtPickerRef = useRef<any>(moment().endOf("day").toISOString());
+  const menuRef = useRef<any>();
+  const { height } = useResponsive();
+  const [priorityColors] = useContext(PriorityColorsContext);
+  var yesterday = moment().subtract(1, "day");
   useEffect(() => {
     setDueDateText(moment(task.dueDate).fromNow());
   }, [task.dueDate]);
+  useOutsideClick(menuRef, () => {
+    setShowMenu(false);
+  });
 
-  const dtPickerRef = useRef<any>(moment().toISOString());
-  const menuRef = useRef<any>();
-  const { height } = useResponsive();
-  const { xPos, yPos, showMenu, itemId, setShowMenu } = useContextMenu(
-    data.outerRef,
-    menuRef,
-    0,
-    0
-  );
-  const [priorityColors] = useContext(PriorityColorsContext);
-  var yesterday = moment().subtract(1, "day");
   var valid = (current: any) => {
     return current.isAfter(yesterday);
   };
@@ -161,7 +163,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
         {
           children: "Delete This Task",
           leftIcon: <BiTrash />,
-          callbackFn: () => data.deleteTask(itemId),
+          callbackFn: () => data.deleteTask(task.id),
         },
         {
           children: "Set Deadline",
@@ -178,7 +180,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           leftIcon: <BsExclamationDiamond />,
           callbackFn: () => {
             setShowMenu(false);
-            data.editTask(itemId, { ...task, priority: 2 });
+            data.editTask(task.id, { ...task, priority: 2 });
           },
         },
         {
@@ -186,7 +188,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           leftIcon: <BsDiamondHalf />,
           callbackFn: () => {
             setShowMenu(false);
-            data.editTask(itemId, { ...task, priority: 1 });
+            data.editTask(task.id, { ...task, priority: 1 });
           },
         },
         {
@@ -196,7 +198,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           ),
           callbackFn: () => {
             setShowMenu(false);
-            data.editTask(itemId, { ...task, priority: 0 });
+            data.editTask(task.id, { ...task, priority: 0 });
           },
         },
         // {
@@ -227,7 +229,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           isDisabled: false,
           callbackFn: () => {
             setShowMenu(false);
-            data.editTask(itemId, { ...task, dueDate: dtPickerRef.current });
+            data.editTask(task.id, { ...task, dueDate: dtPickerRef.current });
           },
         },
         {
@@ -236,7 +238,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           leftIcon: <MdClear />,
           callbackFn: () => {
             setShowMenu(false);
-            data.editTask(itemId, { ...task, dueDate: null });
+            data.editTask(task.id, { ...task, dueDate: null });
           },
         },
       ],
@@ -273,6 +275,30 @@ export function Task({ provided, task, style, isDragging, data }: any) {
               textAlign="left"
             ></InputBox>
           </TaskTitle>
+
+          <span ref={menuRef}>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                setYPos(e.pageY);
+                setXPos(e.pageX);
+                setShowMenu(true);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <VscKebabVertical></VscKebabVertical>
+            </span>
+            {showMenu && (
+              <ContextMenu
+                {...{
+                  dropdownMenu,
+                  xPos: `${xPos}px`,
+                  yPos: `${yPos}px`,
+                }}
+                ref={menuRef}
+              />
+            )}
+          </span>
         </TitleRow>
         <TaskCardFooter>
           {task.dueDate && (
@@ -295,7 +321,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
           )}
         </TaskCardFooter>
       </TaskCard>
-      {showMenu && itemId === task.id && (
+      {/* {showMenu && itemId === task.id && (
         <div>
           <ContextMenu
             {...{
@@ -306,7 +332,7 @@ export function Task({ provided, task, style, isDragging, data }: any) {
             ref={menuRef}
           />
         </div>
-      )}
+      )} */}
     </BoardItemEl>
   );
 }

@@ -1,5 +1,7 @@
 # Change log
 
+## [1.2.5] - 24th Jan, 2021
+- Changed context-menu to inline menu on task.
 ## [1.2.4] - 16th Jan, 2021
 - Fix: Display context menu based on page height
 - Add logo to VSAgile
