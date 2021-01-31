@@ -1,5 +1,8 @@
 # Change log
 
+## [1.2.5] - 31th Jan, 2021
+- Feat: Add tree-view for boards.
+- Create/Open board from tree-view.
 ## [1.2.4] - 16th Jan, 2021
 - Fix: Display context menu based on page height
 - Add logo to VSAgile
