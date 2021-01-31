@@ -54,18 +54,22 @@ function quickPick(boardFolder: string, extensionPath: string) {
     },
     async (e) => {
       if (e === "isEmpty") {
-        const text = await vscode.window.showInputBox({
-          prompt: `Existing boards will be opened if same name is used.`,
-          value: "",
-          placeHolder: "Board Title",
-        });
-        createBoard(boardFolder, extensionPath, text);
+        addBoard(boardFolder, extensionPath);
       }
     }
   );
 }
 
-function createBoard(
+export async function addBoard(boardFolder: string, extensionPath: string) {
+  const text = await vscode.window.showInputBox({
+    prompt: `Existing boards will be opened if same name is used.`,
+    value: "",
+    placeHolder: "Board Title",
+  });
+  createBoard(boardFolder, extensionPath, text);
+}
+
+export function createBoard(
   boardFolder: string,
   extensionPath: string,
   value: string | undefined
