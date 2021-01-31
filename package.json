@@ -2,7 +2,7 @@
   "name": "vscode-agile-board",
   "description": "A tool to manage work at personal or organization level through visual representation.",
   "displayName": "VSAgile",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "icon": "media/icon/logo.png",
   "engines": {
     "vscode": "^1.23.0"
@@ -28,7 +28,11 @@
   ],
   "activationEvents": [
     "onCommand:vsagile.start",
-    "onCommand:vsagile.setupBoard"
+    "onCommand:vsagile.open",
+    "onCommand:vsagile.add",
+    "onCommand:vsagile.setupBoard",
+    "onCommand:vsagile.refreshTree",
+    "onView:vsagile"
   ],
   "main": "./build/ext-src/extension.js",
   "license": "MIT",
@@ -59,14 +63,68 @@
         "title": "VSAgile: Start New/Open Existing Board"
       },
       {
+        "command": "vsagile.open",
+        "title": "Open Existing Board"
+      },
+      {
+        "command": "vsagile.add",
+        "title": "Add New Board",
+        "icon": {
+          "light": "./media/light/plus.svg",
+          "dark": "./media/dark/plus.svg"
+        }
+      },
+      {
         "command": "vsagile.setupBoard",
         "title": "VSAgile: Run setup"
+      },
+      {
+        "command": "vsagile.refreshTree",
+        "title": "Refresh",
+        "icon": {
+          "light": "./media/light/refresh.svg",
+          "dark": "./media/dark/refresh.svg"
+        }
       }
-    ]
+    ],
+    "views": {
+      "vsagile": [
+        {
+          "id": "vsagile",
+          "name": "VSAgile"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vsagile",
+          "title": "VSAgile",
+          "icon": "./media/icon/vsagile_icon.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "vsagile.refreshTree",
+          "when": "view == vsagile",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vsagile.add",
+          "when": "view == vsagile && viewItem == rootBoard",
+          "group": "inline"
+        }
+      ]
+    }
   },
   "dependencies": {
     "classnames": "^2.2.6",
     "fs-extra": "^9.0.1",
+    "klaw": "^3.0.0",
     "lodash.startcase": "^4.4.0",
     "moment": "^2.29.1",
     "node-sass": "^4.0.0",
@@ -96,6 +154,7 @@
     "@types/classnames": "^2.2.11",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^23.3.13",
+    "@types/klaw": "^3.0.1",
     "@types/lodash.startcase": "^4.4.6",
     "@types/moment": "^2.13.0",
     "@types/node": "^10.1.2",

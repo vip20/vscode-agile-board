@@ -1,5 +1,8 @@
 # Change log
 
+## [1.2.6] - 31th Jan, 2021
+- Feat: Add tree-view for boards.
+- Create/Open board from tree-view.
 ## [1.2.5] - 24th Jan, 2021
 - Changed context-menu to inline menu on task.
 ## [1.2.4] - 16th Jan, 2021
