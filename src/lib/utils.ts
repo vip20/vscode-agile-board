@@ -68,10 +68,23 @@ export function updateConfigJson(boardPath: string, data: types.Board) {
 }
 
 export function getDirectories(source: string) {
+  return getDirectoriesWithTime(source).map((x) => x.name);
+}
+export function getDirectoriesWithTime(source: string) {
   return fs
     .readdirSync(source, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name.replace(BLANK_SPACE_ALTERNATIVE, " "));
+    .map((dirent) => ({
+      name: dirent.name,
+      time: fs.statSync(path.join(source, dirent.name)).ctime.getTime(),
+    }))
+    .sort((a, b) => {
+      return b.time - a.time;
+    })
+    .map((x) => ({
+      name: x.name.replace(BLANK_SPACE_ALTERNATIVE, " "),
+      time: x.time,
+    }));
 }
 let current: QuickInput;
 
