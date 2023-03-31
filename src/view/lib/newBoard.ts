@@ -10,8 +10,10 @@ import {
   reFetchSettings,
   getBoardFolder,
 } from './utils';
-import { ACTION, BLANK_SPACE_ALTERNATIVE, defaultBoardConfig } from '../../core/constants';
+import { BLANK_SPACE_ALTERNATIVE, defaultBoardConfig } from '../../core/constants';
 import { Board } from '../../core/types';
+import { ViewLoader } from '../ViewLoader';
+import { Message } from './messageTypes';
 const moment = require('moment');
 
 let allDirectories: string[] = [];
@@ -19,7 +21,7 @@ let allDirectories: string[] = [];
 export default function newBoard(
   boardFolder: string,
   extensionPath: string,
-  panel: vscode.WebviewPanel
+  context: vscode.ExtensionContext
 ) {
   let boardExists = false;
   if (boardFolder) {
@@ -29,9 +31,9 @@ export default function newBoard(
     vscode.window.showErrorMessage('Default board folder not found. Please run setup.');
     return;
   }
-  quickPick(boardFolder, extensionPath, panel);
+  quickPick(boardFolder, extensionPath, context);
 }
-function quickPick(boardFolder: string, extensionPath: string, panel: vscode.WebviewPanel) {
+function quickPick(boardFolder: string, extensionPath: string, context: vscode.ExtensionContext) {
   allDirectories = getDirectories(boardFolder);
   const quickPickItems: vscode.QuickPickItem[] = allDirectories.map(x => ({
     label: x,
@@ -47,11 +49,11 @@ function quickPick(boardFolder: string, extensionPath: string, panel: vscode.Web
   });
   inputPromise.then(
     value => {
-      createBoard(boardFolder, extensionPath, value.label, panel);
+      createBoard(boardFolder, extensionPath, value.label, context);
     },
     async e => {
       if (e === 'isEmpty') {
-        addBoard(boardFolder, extensionPath, panel);
+        addBoard(boardFolder, extensionPath, context);
       }
     }
   );
@@ -60,21 +62,21 @@ function quickPick(boardFolder: string, extensionPath: string, panel: vscode.Web
 export async function addBoard(
   boardFolder: string,
   extensionPath: string,
-  panel: vscode.WebviewPanel
+  context: vscode.ExtensionContext
 ) {
   const text = await vscode.window.showInputBox({
     prompt: `Existing boards will be opened if same name is used.`,
     value: '',
     placeHolder: 'Board Title',
   });
-  createBoard(boardFolder, extensionPath, text, panel);
+  createBoard(boardFolder, extensionPath, text, context);
 }
 
 export function createBoard(
   boardFolder: string,
   extensionPath: string,
   value: string | undefined,
-  panel: vscode.WebviewPanel
+  context: vscode.ExtensionContext
 ) {
   if (value === null || value === '' || !value) {
     return false;
@@ -99,14 +101,23 @@ export function createBoard(
     });
     fs.writeJsonSync(boardConfigFile, config);
   }
+  const panel = ViewLoader.showWebview(context);
   panel.title = `VSAgile: ${value}`;
-  panel.webview.postMessage({
-    action: ACTION.fetchJson,
-    data: config,
-  });
-  panel.webview.postMessage({
-    action: ACTION.allDirectories,
-    data: allDirectories,
+  panel.webview.onDidReceiveMessage((message: Message) => {
+    if (message.type === 'boardInitialized') {
+      panel.webview.postMessage({
+        type: 'fetchJson',
+        payload: {
+          data: config,
+        },
+      });
+      panel.webview.postMessage({
+        type: 'allDirectories',
+        payload: {
+          data: allDirectories,
+        },
+      });
+    }
   });
   reFetchSettings(panel);
 }

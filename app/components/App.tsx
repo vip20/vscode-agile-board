@@ -5,6 +5,7 @@ import './App.scss';
 import { Board } from './Board';
 import { defaultBoardConfig } from '../../src/core/constants';
 import * as t from '../../src/core/types';
+import { ResponsiveProvider } from '../hooks/useResponsive';
 
 export const App = () => {
   const [messagesFromExtension, setMessagesFromExtension] = useState<string[]>([]);
@@ -22,16 +23,20 @@ export const App = () => {
     dirRef.current = data;
     _setAllDirectories(dirRef.current);
   };
-
+  useEffect(() => {
+    vscode.postMessage({
+      type: 'boardInitialized',
+    });
+  }, []);
   const handleMsgEvent = useCallback((event: any) => {
-    const message = event.data;
-    if (message.action && message.data) {
-      switch (message.action) {
+    const message: Message = event.data;
+    if (message.type && message.payload?.data) {
+      switch (message.type) {
         case 'fetchJson':
-          setConfigJson(message.data);
+          setConfigJson(message.payload.data);
           break;
         case 'allDirectories':
-          setAllDirectories(message.data);
+          setAllDirectories(message.payload.data);
           break;
       }
     }
@@ -73,8 +78,11 @@ export const App = () => {
     //     </PriorityColorsProvider>
     //   </MessagesContext.Provider>
     // </Router>
-    <PriorityColorsProvider>
-      <Board configJson={configJson} allDirectoryNames={allDirectories}></Board>
-    </PriorityColorsProvider>
+
+    <ResponsiveProvider>
+      <PriorityColorsProvider>
+        <Board configJson={configJson} allDirectoryNames={allDirectories}></Board>
+      </PriorityColorsProvider>
+    </ResponsiveProvider>
   );
 };

@@ -92,6 +92,7 @@ export class ViewLoader {
     
         <body>
           <div id="root"></div>
+          <div id="context-menu-root"></div>
           <script>
             const vscode = acquireVsCodeApi();
           </script>

@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as types from '../../core/types';
 import { window, QuickPickItem, Disposable, QuickInput, workspace, WebviewPanel } from 'vscode';
 import { QuickPickParameters } from '../../core/types';
-import { ACTION, BLANK_SPACE_ALTERNATIVE } from '../../core/constants';
+import { BLANK_SPACE_ALTERNATIVE } from '../../core/constants';
 
 // Resolves the home tilde.
 export function resolveHome(filepath: string) {
@@ -49,8 +49,10 @@ export function getPriorityColorScheme() {
 
 export function reFetchSettings(panel: WebviewPanel) {
   panel.webview.postMessage({
-    action: ACTION.priorityColors,
-    data: getPriorityColorScheme(),
+    type: 'priorityColors',
+    payload: {
+      data: getPriorityColorScheme(),
+    },
   });
 }
 
@@ -139,7 +141,9 @@ export const reFetchConfig = (boardName: string, panel: WebviewPanel) => {
   let config: types.Board = fs.readJSONSync(boardConfigFile, { throws: false });
 
   panel.webview.postMessage({
-    action: ACTION.fetchJson,
-    data: config,
+    type: 'fetchJson',
+    payload: {
+      data: config,
+    },
   });
 };

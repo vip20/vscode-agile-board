@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { useCallback } from 'react';
-import { ACTION, PRIORITY_COLORS } from '../../src/core/constants';
+import { PRIORITY_COLORS } from '../../src/core/constants';
+import { Message } from '../../src/view/lib/messageTypes';
 
 export const PriorityColorsContext = React.createContext<any>([]);
 
@@ -15,11 +16,11 @@ export const PriorityColorsProvider = (props: any) => {
   };
 
   const handleMsgEvent = useCallback((event: any) => {
-    const message = event.data;
-    if (message.action && message.data) {
-      switch (message.action) {
-        case ACTION.priorityColors:
-          setPriorityColors(message.data);
+    const message: Message = event.data;
+    if (message.type && message.payload?.data) {
+      switch (message.type) {
+        case 'priorityColors':
+          setPriorityColors(message.payload.data);
           break;
       }
     }

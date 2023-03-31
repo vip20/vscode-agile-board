@@ -21,6 +21,7 @@ export const Board = ({ configJson, allDirectoryNames }: any) => {
     setState(configJson);
     if (configJson !== defaultBoardConfig) {
       vscode.setState(configJson);
+      setBoardName(configJson.boardName);
     }
   }, [configJson]);
 
@@ -202,7 +203,7 @@ export const Board = ({ configJson, allDirectoryNames }: any) => {
     newState.columns[columnId].tasksIds.push(newTask.id);
     vscode.postMessage({
       type: 'addTaskFile',
-      payload: { boardName: state.boardName, taskId: uid, data: newState },
+      payload: { boardName: boardName, taskId: uid, data: newState },
     });
     updateState(newState);
   }
@@ -211,7 +212,7 @@ export const Board = ({ configJson, allDirectoryNames }: any) => {
     vscode.postMessage({
       type: 'openTaskFile',
       payload: {
-        boardName: state.boardName,
+        boardName: boardName,
         fileName: fileName,
       },
     });
@@ -224,7 +225,7 @@ export const Board = ({ configJson, allDirectoryNames }: any) => {
     vscode.postMessage({
       type: 'deleteFiles',
       payload: {
-        boardName: state.boardName,
+        boardName: boardName,
         fileNames: fileNames,
       },
     });
@@ -236,7 +237,7 @@ export const Board = ({ configJson, allDirectoryNames }: any) => {
         <BoardName className="board-name">
           <InputBox
             title="Edit Board Name"
-            value={state.boardName}
+            value={boardName}
             errMsg={nameErrMsg}
             onChange={(e: string) => setBoardName(e)}
             applyChange={(e: string) => updateBoardName(e)}

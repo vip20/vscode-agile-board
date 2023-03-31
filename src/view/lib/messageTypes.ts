@@ -12,7 +12,8 @@ export type MessageType =
   | 'deleteFiles'
   | 'priorityColors'
   | 'reFetchSettings'
-  | 'reFetchConfig';
+  | 'reFetchConfig'
+  | 'boardInitialized';
 
 export interface Message {
   type: MessageType;

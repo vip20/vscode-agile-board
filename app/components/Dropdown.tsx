@@ -71,8 +71,8 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
           onEnter={calcHeight}
         >
           <div className="menu">
-            {primaryItems.map(item => {
-              return <DropdownItem {...item} />;
+            {primaryItems.map((item, id) => {
+              return <DropdownItem {...item} key={id} />;
             })}
           </div>
         </CSSTransition>
@@ -80,7 +80,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
 
       {secondaryKeys &&
         secondaryKeys.length > 0 &&
-        secondaryKeys.map(k => {
+        secondaryKeys.map((k, id) => {
           let currentSecMenu = menu.secondary && menu.secondary[k] ? menu.secondary[k] : [];
           return (
             <CSSTransition
@@ -89,6 +89,7 @@ export default function DropdownMenu(menu: t.DropdownMenu) {
               classNames="menu-secondary"
               unmountOnExit
               onEnter={() => setMenuHeight('auto')}
+              key={id}
             >
               <div className="menu">
                 <DropdownItem goToMenu="main" leftIcon={<VscArrowLeft />}>

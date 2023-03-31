@@ -19,24 +19,22 @@ export function activate(context: vscode.ExtensionContext) {
   // openBoard
   let openBoardDisposable = vscode.commands.registerCommand('vsagile.open', board => {
     const boardFolder = getBoardFolder();
-    const panel = ViewLoader.showWebview(context);
-    createBoard(boardFolder, context.extensionPath, board, panel);
+    // const panel = ViewLoader.showWebview(context);
+    createBoard(boardFolder, context.extensionPath, board, context);
   });
   context.subscriptions.push(openBoardDisposable);
 
   // Add Board
   let addBoardDisposable = vscode.commands.registerCommand('vsagile.add', () => {
     const boardFolder = getBoardFolder();
-    const panel = ViewLoader.showWebview(context);
-    addBoard(boardFolder, context.extensionPath, panel);
+    addBoard(boardFolder, context.extensionPath, context);
   });
   context.subscriptions.push(addBoardDisposable);
 
   // Start Board
   let newBoardDisposable = vscode.commands.registerCommand('vsagile.start', () => {
     const boardFolder = getBoardFolder();
-    const panel = ViewLoader.showWebview(context);
-    newBoard(boardFolder, context.extensionPath, panel);
+    newBoard(boardFolder, context.extensionPath, context);
   });
   context.subscriptions.push(newBoardDisposable);
 

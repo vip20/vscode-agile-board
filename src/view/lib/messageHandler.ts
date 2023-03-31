@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { ACTION, BLANK_SPACE_ALTERNATIVE } from '../../core/constants';
+import { BLANK_SPACE_ALTERNATIVE } from '../../core/constants';
 import {
   getBoardFolder,
   getDirectories,
@@ -11,40 +11,44 @@ import {
 import { window, Disposable, WebviewPanel } from 'vscode';
 import { createTask, deleteFile, openFileSide } from './newTask';
 import * as t from '../../core/types';
+import { Message } from './messageTypes';
 
 // Handle messages from the webview
 export default function handleMessages(panel: WebviewPanel, _disposables: Disposable[]) {
   panel.webview.onDidReceiveMessage(
-    message => {
+    (message: Message) => {
       const boardFolder = getBoardFolder();
-      switch (message.action) {
-        case ACTION.alert:
-          window.showErrorMessage(message.data);
+      const payload = message.payload;
+      switch (message.type) {
+        case 'alert':
+          window.showErrorMessage(payload.data);
           break;
-        case ACTION.updateJson:
+        case 'updateJson':
           let dirPath = path.join(
             boardFolder,
-            message.board.replace(/\s/g, BLANK_SPACE_ALTERNATIVE)
+            payload.board.replace(/\s/g, BLANK_SPACE_ALTERNATIVE)
           );
-          updateConfigJson(dirPath, message.data);
+          updateConfigJson(dirPath, payload.data);
           break;
-        case ACTION.renameBoard:
-          let toValue = message.to.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
-          let fromValue = message.from.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
+        case 'renameBoard':
+          let toValue = payload.to.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
+          let fromValue = payload.from.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
           let fromDir = path.join(boardFolder, fromValue);
           let toDir = path.join(boardFolder, toValue);
-          panel.title = `VSAgile: ${message.to}`;
+          panel.title = `VSAgile: ${payload.to}`;
           updateDirName(fromDir, toDir);
-          updateConfigJson(toDir, message.data);
+          updateConfigJson(toDir, payload.data);
           panel.webview.postMessage({
-            action: ACTION.allDirectories,
-            data: getDirectories(boardFolder),
+            type: 'allDirectories',
+            payload: {
+              data: getDirectories(boardFolder),
+            },
           });
           break;
-        case ACTION.addTaskFile:
-          let data: t.Board = message.data;
-          let taskId = message.taskId;
-          let boardName = message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
+        case 'addTaskFile':
+          let data: t.Board = payload.data;
+          let taskId = payload.taskId;
+          let boardName = payload.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE);
           createTask(boardFolder, boardName, taskId).then((fileName: string) => {
             if (data.tasks[taskId].files) {
               data.tasks[taskId].files.push(fileName);
@@ -54,35 +58,37 @@ export default function handleMessages(panel: WebviewPanel, _disposables: Dispos
             let boardPath = path.join(boardFolder, boardName);
             updateConfigJson(boardPath, data);
             panel.webview.postMessage({
-              action: ACTION.fetchJson,
-              data: data,
+              type: 'fetchJson',
+              payload: {
+                data: data,
+              },
             });
           });
           break;
-        case ACTION.openTaskFile:
+        case 'openTaskFile':
           let fullPath = path.join(
             boardFolder,
-            message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
-            message.fileName
+            payload.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
+            payload.fileName
           );
           openFileSide(fullPath);
           break;
-        case ACTION.deleteFiles:
-          let fileNames: string[] = message.fileNames;
+        case 'deleteFiles':
+          let fileNames: string[] = payload.fileNames;
           fileNames.forEach(fileName => {
             let fullPath = path.join(
               boardFolder,
-              message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
+              payload.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE),
               fileName
             );
             deleteFile(fullPath);
           });
           break;
-        case ACTION.reFetchSettings:
+        case 'reFetchSettings':
           reFetchSettings(panel);
           break;
-        case ACTION.reFetchConfig:
-          reFetchConfig(message.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE), panel);
+        case 'reFetchConfig':
+          reFetchConfig(payload.boardName.replace(/\s/g, BLANK_SPACE_ALTERNATIVE), panel);
           break;
       }
     },
