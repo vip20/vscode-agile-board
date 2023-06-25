@@ -33,11 +33,6 @@ export const InputBoxContainer = styled.div`
     animation-duration: 1s;
     max-width: 100%;
     display: inline-flex;
-    .text {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
   @keyframes appear {
     from {
